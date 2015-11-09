@@ -3,17 +3,17 @@ package fr.obd2Reader.command.pressure;
 import fr.obd2Reader.command.ObdCommand;
 
 public abstract class PressureCommand extends ObdCommand{
-	private int pressure;
+	private double pressure;
 	
 	public PressureCommand(String command){
 		super(command);
 	}
 	
-	public int getPressure(){
+	public double getPressure(){
 		return pressure;
 	}
 	
-	public void setPressure(int pressure){
+	public void setPressure(double pressure){
 		this.pressure = pressure;
 	}
 }
