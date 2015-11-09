@@ -183,6 +183,7 @@ public class BluetoothConnection {
 		}
 	}
 	
+	//déplacer vers ObdCommand
 	/**
      * Send a message to the other end of the connection through an opened output stream.
 	 *
@@ -200,19 +201,18 @@ public class BluetoothConnection {
 		return false;
 	}
 	
+	//déplacer vers ObdCommand
 	/**
      * Read every character into the input stream's buffer until the first occurrence of the delimiter.
 	 *
 	 *@param delimiter : character to reach before stopping to scan input stream buffer.
 	 *@return String : phrase read since last scan of the input stream buffer.
      */
-	//test
 	public String readUntil(String delimiter){
 		String inBufStr = "";
 		if(inputStream!=null){
 			try{
 				while(!inBufStr.endsWith(delimiter)){
-					//test
 					inBufStr += readChar();
 				}
 			}catch(Exception e){
@@ -223,6 +223,7 @@ public class BluetoothConnection {
 		return inBufStr;
 	}
 	
+	//déplacer vers ObdCommand
 	/**
      * Read one character from an input stream and cast the bytes received from int to ASCII.
 	 *
@@ -285,7 +286,6 @@ public class BluetoothConnection {
 			for(int i=0; i<services.length; i++){
 				String url = services[i].getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
 				urls.add(url);
-				System.out.println(url);
 			}
 			
 		}
