@@ -112,6 +112,38 @@ public class BluetoothConnection {
      * Search for the services of a given bluetooth device and stock every connection URL encountered.
 	 *
 	 *@param deviceStr : friendly name of the device to search services from.
+	 *@param protocol : UUID String value of the short-code protocol needed for the services research.
+	 *@return int : number of services found. -1 if error.
+     */
+	public int searchServices(String deviceStr, String protocol){
+		if(discoveryAgent!=null){
+			try{
+				if(!devices.isEmpty() && devicesNames.contains(deviceStr)){
+					UUID[] uuidSet = new UUID[1];
+					uuidSet[0] = new UUID(protocol, true);
+					RemoteDevice device = devices.get(devicesNames.indexOf(deviceStr));
+					int servicesNb = discoveryAgent.searchServices(null, uuidSet, device, new Discovery());
+					
+					try{
+						synchronized(lock){
+							lock.wait();
+						}
+					}catch(InterruptedException e){
+						e.printStackTrace();
+					}
+					return servicesNb;
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return -1;
+	}
+	
+	/**
+     * Search for the services of a given bluetooth device and stock every connection URL encountered.
+	 *
+	 *@param deviceStr : friendly name of the device to search services from.
 	 *@param protocol : UUID short-code protocol needed for the services research.
 	 *@return int : number of services found. -1 if error.
      */
