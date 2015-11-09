@@ -192,7 +192,8 @@ public class BluetoothConnection {
 	public boolean send(String message){
 		if(outputStream!=null){
 			try {
-				outputStream.write(message.getBytes());
+				outputStream.write((message + "\r").getBytes());
+				outputStream.flush();
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -209,7 +210,7 @@ public class BluetoothConnection {
 	 *@return String : phrase read since last scan of the input stream buffer.
      */
 	public String readUntil(String delimiter){
-		String inBufStr = "";
+		String inBufStr = "\r";
 		if(inputStream!=null){
 			try{
 				while(!inBufStr.endsWith(delimiter)){

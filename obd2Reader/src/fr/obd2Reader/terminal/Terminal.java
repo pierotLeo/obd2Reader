@@ -23,7 +23,7 @@ public class Terminal {
 		String url;
 		
 		if(btConnection.searchDevices()){
-			if(btConnection.searchServices("GT-I9100", 0x0100)!=0){
+			if(btConnection.searchServices("OBDII", 0x0100)!=0){
 				url = findRfcommUrl(btConnection.getUrls());
 				if(!url.isEmpty()){
 					btConnection.clientConnection(url);
