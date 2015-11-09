@@ -52,6 +52,7 @@ public class BluetoothConnection {
      * Called by garbage collector. Close the streams and connection if a connection was made.
 	 *
      */
+	@Override
 	public void finalize(){
 		if(streamConnection!=null && inputStream!=null && outputStream!=null){
 			try {
@@ -110,7 +111,7 @@ public class BluetoothConnection {
 	/**
      * Search for the services of a given bluetooth device and stock every connection URL encountered.
 	 *
-	 *@param device : friendly name of the device to search services from.
+	 *@param deviceStr : friendly name of the device to search services from.
 	 *@param protocol : UUID short-code protocol needed for the services research.
 	 *@return int : number of services found. -1 if error.
      */
@@ -187,6 +188,7 @@ public class BluetoothConnection {
 	/**
      * Send a message to the other end of the connection through an opened output stream.
 	 *
+	 *@param message : message to send through the output stream.
 	 *@return boolean : whether dispatch of the message was successful or not.
      */
 	public boolean send(String message){
