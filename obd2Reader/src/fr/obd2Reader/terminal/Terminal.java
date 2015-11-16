@@ -15,7 +15,7 @@ public class Terminal {
 		btConnection = new BluetoothConnection();
 		connectToElm327(btConnection);
 		btConnection.send("ATZ");
-		btConnection.readUntil(">");
+		System.out.println(btConnection.readUntil(">"));
 	}
 	
 	/**

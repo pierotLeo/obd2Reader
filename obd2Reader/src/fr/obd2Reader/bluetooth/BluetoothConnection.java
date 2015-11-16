@@ -252,7 +252,7 @@ public class BluetoothConnection {
 	 *@return String : phrase read since last scan of the input stream buffer.
      */
 	public String readUntil(String delimiter){
-		String inBufStr = "\r";
+		String inBufStr = "";
 		if(inputStream!=null){
 			try{
 				while(!inBufStr.endsWith(delimiter)){
