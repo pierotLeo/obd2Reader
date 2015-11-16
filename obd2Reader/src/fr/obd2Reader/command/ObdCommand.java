@@ -1,3 +1,4 @@
+
 package fr.obd2Reader.command;
 
 import java.io.*;
@@ -7,22 +8,44 @@ public abstract class ObdCommand {
 	
 	private String command;
 	private ArrayList<Integer> inBuff;
+	private OutputStream out;
+	private InputStream in;
 	
-	public ObdCommand(String command){
+	public ObdCommand(String command, OutputStream out, InputStream in){
 		this.command = command;
 		this.inBuff = new ArrayList<Integer>();
+		this.out = out;
+		this.in = in;
 	}
 	
-	protected abstract void calculate();
+	public abstract void calculate();
 	
-	//rendre la lecture et l'écriture interne à chaque objet ObdCommand
-	public void sendCommand(OutputStream out){
-		
+	protected void sendCommand(){
+		try {
+			out.write(command.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public String read(InputStream in){
-		String inBuf = "";
-		return inBuf;
+	protected void read(){
+		try{
+			//tant que le caractère lu est différent de >...
+			while(!Character.toString((char)in.read()).equals(">")){
+				//on ajoute l'entier lu au buffer de l'instance.
+				inBuff.add(in.read());
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public InputStream getIn(){
+		return in;
+	}
+	
+	public OutputStream getOut(){
+		return out;
 	}
 	
 	protected ArrayList<Integer> getInBuff(){

@@ -74,6 +74,14 @@ public class BluetoothConnection {
 		return this.devices;
 	}
 	
+	public OutputStream getOutputStream(){
+		return outputStream;
+	}
+	
+	public InputStream getInputStream(){
+		return inputStream;
+	}
+	
 	/**
 	 * Getter of attribut services.
 	 * 

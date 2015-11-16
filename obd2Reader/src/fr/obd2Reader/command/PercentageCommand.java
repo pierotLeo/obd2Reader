@@ -1,14 +1,19 @@
 package fr.obd2Reader.command;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public abstract class PercentageCommand extends ObdCommand{
 	
 	private float percentage;
 	
-	public PercentageCommand(String command){
-		super(command);
+	public PercentageCommand(String command, OutputStream out, InputStream in){
+		super(command, out, in);
 	}
 	
-	protected void calculate(){
+	public void calculate(){
+		sendCommand();
+		read();
 		percentage = getInBuff().get(0)*100/255;
 	}
 }

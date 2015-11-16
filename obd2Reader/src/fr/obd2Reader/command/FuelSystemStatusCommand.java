@@ -1,15 +1,20 @@
 package fr.obd2Reader.command;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class FuelSystemStatusCommand extends ObdCommand{
 
 	private String[] status;
 	
-	public FuelSystemStatusCommand(){
-		super("01 03");
+	public FuelSystemStatusCommand(OutputStream out, InputStream in){
+		super("01 03", out, in);
 		status = new String[2];
 	}
 	
-	protected void calculate(){
+	public void calculate(){
+		sendCommand();
+		read();
 		for(int i = 0; i<2; i++){
 			switch(getInBuff().get(i)){
 				case 1 : status[i] = "Open loop due to insufficient engine temperature"; break;
