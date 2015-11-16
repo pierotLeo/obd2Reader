@@ -9,9 +9,9 @@ public class EvaporationSystemVaporPressure extends PressureCommand{
 		super("01 32", out, in);
 	}
 	
-	public void calculate(OutputStream out, InputStream in){
-		sendCommand(out);
-		read(in);
+	public void calculate(){
+		sendCommand();
+		read();
 		setPressure(((getInBuff().get(0)*256) + getInBuff().get(1))/4);
 	}
 
