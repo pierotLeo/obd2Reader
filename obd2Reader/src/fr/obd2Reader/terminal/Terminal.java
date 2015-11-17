@@ -2,6 +2,7 @@ package fr.obd2Reader.terminal;
 
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -11,12 +12,22 @@ import fr.obd2Reader.command.speed.SpeedCommand;
 
 public class Terminal {
 
-	BluetoothConnection btConnection;
+	private BluetoothConnection btConnection;
+	private Scanner sc;
 	
 	public Terminal(){
+		sc = new Scanner(System.in);
 		btConnection = new BluetoothConnection();
 		connectToElm327(btConnection);
 		btConnection.send("ATZ");
+		System.out.println(btConnection.readUntil(">"));
+		btConnection.send("AT0");
+		System.out.println(btConnection.readUntil(">"));
+		btConnection.send("ATL0");
+		System.out.println(btConnection.readUntil(">"));
+		btConnection.send("ATE0");
+		System.out.println(btConnection.readUntil(">"));
+		btConnection.send("ATSThh");
 		System.out.println(btConnection.readUntil(">"));
 	}
 	
@@ -54,8 +65,16 @@ public class Terminal {
 		return url;
 	}
 	
+	public final static void clearConsole()
+	{
+		String clr = "";
+		for(int i=0; i<70; i++){
+			clr+="\n";
+		}
+		System.out.println(clr);
+	}
+	
 	public void directRequestTerminal(){
-		Scanner sc = new Scanner(System.in);
 		String input = "";
 		System.out.println("Entrez ce que vous souhaitez envoyer au module ELM327, ou \"quitter\" pour retourner au menu.");
 		while(!input.equals("Quitter") && !input.equals("quitter")){
@@ -65,12 +84,14 @@ public class Terminal {
 			}
 			input = sc.nextLine();
 		}
-		sc.close();
+		clearConsole();
 		menu();
 	}
 	
+	/**
+	 * Open a terminal
+	 */
 	public void premadeRequestTerminal(){
-		Scanner sc = new Scanner(System.in);
 		int input = 0;
 		System.out.println("Quel information souhaitez vous récupérer?\n\t"
 				+ "				1-Vitesse actuelle.\n\t"
@@ -78,6 +99,7 @@ public class Terminal {
 				+ "				3-Pression de la vapeur des système d'évaporation actuelle.\n\t"
 				+ "				4-Retourner au menu.");
 		while(input != 4){
+			input = sc.nextInt();
 			if(input != 0){
 				switch(input){
 					case 1:
@@ -88,9 +110,9 @@ public class Terminal {
 					case 2:
 						SpeedCommand speedP = new SpeedCommand(btConnection.getOutputStream(), btConnection.getInputStream());
 						for(int  i = 0; i < 10; i++){
-							speedP.calculate();
-							System.out.println("Vitesse = " + speedP.getSpeed() + " km/h");
 							try {
+								speedP.calculate();
+								System.out.println("Vitesse = " + speedP.getSpeed() + " km/h");
 								Thread.sleep(1000);
 							} catch (InterruptedException e) {
 								e.printStackTrace();
@@ -103,40 +125,40 @@ public class Terminal {
 						System.out.println("Pression de la vapeur des système d'évaporation = " + esvp.getPressure() + " Pa.");
 						break;
 					case 4:
-						sc.close();
 						break;
 					default :
+						clearConsole();
 						System.out.println("Choisissez une requête parmi celles proposées.");
 						break;
 
 				}
-				menu();
 			}
-			input = sc.nextInt();
 		}
-		sc.close();
+		clearConsole();
+		menu();
 	}
 	
 	/**
 	 * Initiate the communication with the user.
 	 */
 	public void menu(){
-		Scanner sc = new Scanner(System.in);
 		int input = 0;
 		System.out.println("Bienvenue sur la version test d'OBD2-reader. Comment souhaitez-vous communiquer avec le module?\n\t1-Requêtes personnalisées.\n\t2-Requêtes pré-construites.\n\t3-quitter.");
 		while(input!=3){
 			input = sc.nextInt();
 			switch(input){
 				case 1 :
+					clearConsole();
 					directRequestTerminal(); 
 					break;
 				case 2 : 
+					clearConsole();
 					premadeRequestTerminal();
 					break;
 				case 3:
-					sc.close();
 					break;
 				default :
+					clearConsole();
 					System.out.println("Choisissez une option valide.");
 					break;
 			}

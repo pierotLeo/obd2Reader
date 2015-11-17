@@ -26,4 +26,5 @@ public class FuelSystemStatusCommand extends ObdCommand{
 			}
 		}
 	}
+	
 }

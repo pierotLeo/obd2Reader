@@ -256,7 +256,7 @@ public class BluetoothConnection {
 		if(inputStream!=null){
 			try{
 				while(!inBufStr.endsWith(delimiter)){
-					inBufStr += readChar();
+					inBufStr += readChar() + " ";
 				}
 			}catch(Exception e){
 				e.printStackTrace();
