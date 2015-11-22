@@ -12,7 +12,7 @@ public class FuelSystemStatusCommand extends ObdCommand{
 		status = new String[2];
 	}
 	
-	public void calculate(){
+	public void compute(){
 		sendCommand();
 		read();
 		for(int i = 0; i<2; i++){
@@ -26,5 +26,4 @@ public class FuelSystemStatusCommand extends ObdCommand{
 			}
 		}
 	}
-	
 }

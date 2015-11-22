@@ -1,14 +1,11 @@
-package fr.obd2Reader.terminal;
-
-
-
-import java.io.IOException;
+package fr.obd2Reader.dialog;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import fr.obd2Reader.bluetooth.BluetoothConnection;
 import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressure;
 import fr.obd2Reader.command.speed.SpeedCommand;
+import fr.obd2Reader.driver.BluetoothConnection;
+
 
 public class Terminal {
 
@@ -104,14 +101,14 @@ public class Terminal {
 				switch(input){
 					case 1:
 						SpeedCommand speed = new SpeedCommand(btConnection.getOutputStream(), btConnection.getInputStream());
-						speed.calculate();
+						speed.compute();
 						System.out.println("Vitesse = " + speed.getSpeed() + " km/h");
 						break;
 					case 2:
 						SpeedCommand speedP = new SpeedCommand(btConnection.getOutputStream(), btConnection.getInputStream());
 						for(int  i = 0; i < 10; i++){
 							try {
-								speedP.calculate();
+								speedP.compute();
 								System.out.println("Vitesse = " + speedP.getSpeed() + " km/h");
 								Thread.sleep(1000);
 							} catch (InterruptedException e) {
@@ -121,7 +118,7 @@ public class Terminal {
 						break;
 					case 3:
 						EvaporationSystemVaporPressure esvp = new EvaporationSystemVaporPressure(btConnection.getOutputStream(), btConnection.getInputStream());
-						esvp.calculate();
+						esvp.compute();
 						System.out.println("Pression de la vapeur des système d'évaporation = " + esvp.getPressure() + " Pa.");
 						break;
 					case 4:
@@ -169,5 +166,4 @@ public class Terminal {
 		Terminal t = new Terminal();
 		t.menu();
 	}
-
 }

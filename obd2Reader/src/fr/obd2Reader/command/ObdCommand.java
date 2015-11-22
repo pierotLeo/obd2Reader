@@ -7,49 +7,49 @@ import java.util.ArrayList;
 public abstract class ObdCommand {
 	
 	private String command;
-	protected int[][] compatibility;
-	private ArrayList<Integer> inBuff;
+	private ArrayList<Byte> inBuff;
 	private OutputStream out;
 	private InputStream in;
 	
 	public ObdCommand(String command, OutputStream out, InputStream in){
 		this.command = command;
-		this.inBuff = new ArrayList<Integer>();
+		this.inBuff = new ArrayList<Byte>();
 		this.out = out;
 		this.in = in;
 	}
 	
-	public abstract void calculate();
+	public ObdCommand(OutputStream out, InputStream in){
+		this.inBuff = new ArrayList<Byte>();
+		this.out = out;
+		this.in = in;
+	}
 	
-	//public abstract boolean isCompatible();
+	public abstract void compute();
 	
-	private void buildCompatibility(){
+	protected void sendCommand(){
 		try {
-			out.write(("0100\r").getBytes());
+			out.write((command+"\r").getBytes());
 			out.flush();
-			for(int i = 0; i < 4; i++){
-				for(int j = 0; j < 8; j++){
-					compatibility[i][j] = Integer.parseInt(Integer.toBinaryString(in.read()).substring(j, j+1));
-				}
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	protected void sendCommand(){
-		try {
-			out.write((command + "\r").getBytes());
+	protected void sendCommand(String cmd){
+		try{
+			out.write((cmd + "\r").getBytes());
 			out.flush();
-		} catch (IOException e) {
+		} catch(IOException e){
 			e.printStackTrace();
 		}
 	}
 	
 	protected void read(){
 		try{
-			while(!Character.toString((char)in.read()).equals(">")){
-				inBuff.add(in.read());
+			char currentRead = ' ';
+			while(!Character.toString(currentRead).equals(">")){
+				currentRead = (char)in.read();
+				inBuff.add(Byte.parseByte(Character.toString(currentRead), 16));
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -64,7 +64,7 @@ public abstract class ObdCommand {
 		return out;
 	}
 	
-	protected ArrayList<Integer> getInBuff(){
+	public ArrayList<Byte> getInBuff(){
 		return inBuff;
 	}
 }

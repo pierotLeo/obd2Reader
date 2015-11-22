@@ -1,4 +1,4 @@
-package fr.obd2Reader.bluetooth;
+package fr.obd2Reader.driver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -256,7 +256,7 @@ public class BluetoothConnection {
 		if(inputStream!=null){
 			try{
 				while(!inBufStr.endsWith(delimiter)){
-					inBufStr += readChar() + " ";
+					inBufStr += readChar();
 				}
 			}catch(Exception e){
 				e.printStackTrace();

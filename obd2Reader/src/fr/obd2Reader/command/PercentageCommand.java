@@ -11,7 +11,7 @@ public abstract class PercentageCommand extends ObdCommand{
 		super(command, out, in);
 	}
 	
-	public void calculate(){
+	public void compute(){
 		sendCommand();
 		read();
 		percentage = getInBuff().get(0)*100/255;
