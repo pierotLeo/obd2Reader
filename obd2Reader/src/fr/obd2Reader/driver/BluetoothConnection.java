@@ -73,7 +73,7 @@ public class BluetoothConnection {
 	/**
 	 * Getter of attribut devices.
 	 * 
-	 * @return ArrayList<RemoteDevice> : list of remote devices.
+	 * @return : list of remote devices.
 	 */
 	public ArrayList<RemoteDevice> getDevices(){
 		return this.devices;
@@ -90,7 +90,7 @@ public class BluetoothConnection {
 	/**
 	 * Getter of attribut services.
 	 * 
-	 * @return ArrayList<RemoteDevice> : list of connection urls affiliated to discovered services.
+	 * @return : list of connection urls affiliated to discovered services.
 	 */
 	public ArrayList<String> getUrls(){
 		return this.urls;
@@ -126,7 +126,7 @@ public class BluetoothConnection {
 	 *
 	 *@param deviceStr : friendly name of the device to search services from.
 	 *@param protocol : UUID String value of the short-code protocol needed for the services research.
-	 *@return int : number of services found. -1 if error.
+	 *@return : number of services found. -1 if error.
      */
 	public int searchServices(String deviceStr, String protocol){
 		if(discoveryAgent!=null){
@@ -158,7 +158,7 @@ public class BluetoothConnection {
 	 *
 	 *@param deviceStr : friendly name of the device to search services from.
 	 *@param protocol : UUID short-code protocol needed for the services research.
-	 *@return int : number of services found. -1 if error.
+	 *@return : number of services found. -1 if error.
      */
 	public int searchServices(String deviceStr, int protocol){
 		if(discoveryAgent!=null){
@@ -190,7 +190,7 @@ public class BluetoothConnection {
 	 *
 	 *@param device : device to search services from.
 	 *@param protocol : UUID short-code protocol needed for the services research.
-	 *@return int : number of services found. -1 if error.
+	 *@return : number of services found. -1 if error.
      */
 	public int searchServices(RemoteDevice device, int protocol){
 		if(discoveryAgent!=null){
@@ -229,12 +229,12 @@ public class BluetoothConnection {
 		}
 	}
 	
-	//déplacer vers ObdCommand
+	
 	/**
      * Send a message to the other end of the connection through an opened output stream.
 	 *
 	 *@param message : message to send through the output stream.
-	 *@return boolean : whether dispatch of the message was successful or not.
+	 *@return : whether dispatch of the message was successful or not.
      */
 	public boolean send(String message){
 		if(outputStream!=null){
@@ -249,12 +249,11 @@ public class BluetoothConnection {
 		return false;
 	}
 	
-	//déplacer vers ObdCommand
 	/**
      * Read every character into the input stream's buffer until the first occurrence of the delimiter.
 	 *
 	 *@param delimiter : character to reach before stopping to scan input stream buffer.
-	 *@return String : phrase read since last scan of the input stream buffer.
+	 *@return : phrase read since last scan of the input stream buffer.
      */
 	public String readUntil(String delimiter){
 		String inBufStr = "";
@@ -271,11 +270,10 @@ public class BluetoothConnection {
 		return inBufStr;
 	}
 	
-	//déplacer vers ObdCommand
 	/**
      * Read one character from an input stream and cast the bytes received from int to ASCII.
 	 *
-	 *@return String : last ASCII character contained in the buffer since last read.
+	 *@return : last ASCII character contained in the buffer since last read.
      */
 	private String readChar(){
 		String inBuf = "";
