@@ -3,10 +3,20 @@ package fr.obd2Reader.command;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * An OBD command getting fuel system status of the vehicle.
+ * @author Supa Kanojo Hunta
+ *
+ */
 public class FuelSystemStatusCommand extends ObdCommand{
 
 	private String[] status;
 	
+	/**
+	 * Default constructor for FuelSystemStatusCommand.
+	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
+	 * @param in : InputStream of a pre-established connection. Used to read information from connection's other end.
+	 */
 	public FuelSystemStatusCommand(OutputStream out, InputStream in){
 		super("01 03", out, in);
 		status = new String[2];

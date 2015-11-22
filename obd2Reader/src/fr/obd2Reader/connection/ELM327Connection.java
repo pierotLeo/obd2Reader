@@ -11,10 +11,18 @@ import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressure;
 import fr.obd2Reader.command.speed.SpeedCommand;
 import fr.obd2Reader.driver.BluetoothConnection;
 
+/**
+ * Object encapsuling a bluetooth connection with an ELM327 module.
+ * @author Supa Kanojo Hunta
+ *
+ */
 public class ELM327Connection {
 
 	private BluetoothConnection btConnection;
 	
+	/**
+	 * Default constructor for ELM327Connection.
+	 */
 	public ELM327Connection(){
 		btConnection = new BluetoothConnection();
 		connectToElm327(btConnection);
@@ -25,7 +33,7 @@ public class ELM327Connection {
 	}
 	
 	/**
-	 * Search for ELM327 module and connect with it if found.
+	 * Search for an ELM327 module and establish a bluetooth connection if found.
 	 * 
 	 * @param btConnection
 	 */
@@ -58,18 +66,34 @@ public class ELM327Connection {
 		return url;
 	}
 	
+	/**
+	 * Send a request to connected ELM327 module.
+	 * @param cmd
+	 */
 	public void send(String cmd){
-				btConnection.send(cmd);
+		btConnection.send(cmd);
 	}
 	
+	/**
+	 * Read informations from connected ELM327 module.
+	 * @return
+	 */
 	public String read(){
 		return(btConnection.readUntil(">"));
 	}
 	
+	/**
+	 * Getter for the input stream.
+	 * @return
+	 */
 	public InputStream getInputStream(){
 		return btConnection.getInputStream();
 	}
 	
+	/**
+	 * Getter for the output stream.
+	 * @return
+	 */
 	public OutputStream getOutputStream(){
 		return btConnection.getOutputStream();
 	}

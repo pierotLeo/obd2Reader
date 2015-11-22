@@ -9,6 +9,11 @@ import javax.swing.*;
 import fr.obd2Reader.command.VehicleCompatibility;
 import fr.obd2Reader.connection.ELM327Connection;
 
+/**
+ * Main window displayed at the user. Contains all the shit you hear me.
+ * @author Supa Kanojo Hunta
+ *
+ */
 public class MainWindow extends JFrame{
 
 	private VehicleCompatibility vehicle;
@@ -16,6 +21,9 @@ public class MainWindow extends JFrame{
 	private JTabbedPane tabbedMenu;
 	private JTextArea terminal;
 	
+	/**
+	 * Default constructor for MainWindow.
+	 */
 	public MainWindow(){
 		super("On-Board Diagnostic Reader");
 		Toolkit tkt = Toolkit.getDefaultToolkit();
@@ -28,11 +36,18 @@ public class MainWindow extends JFrame{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
+	/**
+	 * Fill the main window with a tabbed panel, containing 3 features for now.
+	 */
 	private void initiate(){
 		connection = new ELM327Connection();
 		add(getCenterPanel(), BorderLayout.CENTER);
 	}
 	
+	/**
+	 * Build the big fat ass-booty of main window's tabbed panel.
+	 * @return
+	 */
 	private JTabbedPane getCenterPanel(){
 		tabbedMenu = new JTabbedPane();
 		
@@ -43,6 +58,10 @@ public class MainWindow extends JFrame{
 		return tabbedMenu;
 	}
 	
+	/**
+	 * Build the real time informations panel.
+	 * @return
+	 */
 	private JPanel getRTIPanel(){
 		JPanel RTIPanel = new JPanel();
 		
@@ -64,6 +83,10 @@ public class MainWindow extends JFrame{
 		return RTIPanel;
 	}
 	
+	/**
+	 * Build the error codes panel.
+	 * @return
+	 */
 	private JPanel getErrorCodesPanel(){
 		JPanel errorCodesPanel = new JPanel();
 		
@@ -72,7 +95,10 @@ public class MainWindow extends JFrame{
 		return errorCodesPanel;
 	}
 	
-	
+	/**
+	 * Build the terminal panel.
+	 * @return
+	 */
 	private JTextArea getTerminalPanel(){		
 		terminal = new JTextArea();
 		

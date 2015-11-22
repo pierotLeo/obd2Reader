@@ -16,6 +16,11 @@ import javax.bluetooth.UUID;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
+/**
+ * Bluetooth connection object.
+ * @author Supa Kanojo Hunta
+ *
+ */
 public class BluetoothConnection {
 	private static Object lock;
 	private ArrayList<RemoteDevice> devices;
