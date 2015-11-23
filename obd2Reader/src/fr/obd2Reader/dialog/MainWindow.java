@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -22,7 +24,8 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	private VehicleCompatibility vehicle;
 	private ELM327Connection connection;
 	private JTabbedPane tabbedMenu;
-	private JTextArea terminal;
+	private JTextField terminalOutput;
+	private JTextArea terminalInput;
 	
 	private class InfoListListener implements ListSelectionListener{
 		private JList list;
@@ -32,7 +35,7 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 		}
 		
 		public void valueChanged(ListSelectionEvent e){
-			if(e.getValueIsAdjusting()){
+			if(!e.getValueIsAdjusting()){
 				
 				switch(list.getSelectedIndex()){
 					case NO_SELECTION :
@@ -63,6 +66,37 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 						break;
 				}
 			}
+		}
+	}
+	
+	private class TerminalKeyListener implements KeyListener{
+
+		@Override
+		public void keyPressed(KeyEvent arg0) {
+			int action = arg0.getKeyCode();
+			
+			switch(action){
+				case KeyEvent.VK_ENTER:
+					terminalInput.append(terminalOutput.getText() + "\n");
+					
+					//connection.send(terminalOutput.getText());
+					//terminalInput.append(connection.read() + "\n");
+					
+					terminalOutput.setText("");
+					break;
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	
@@ -108,22 +142,10 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	 * @return
 	 */
 	private JPanel getRTIPanel(){
-		JPanel RTIPanel = new JPanel(new GridLayout(1,2));
+		JPanel RTIPanel = new JPanel(new BorderLayout());
 		
 		vehicle = new VehicleCompatibility(connection.getOutputStream(), connection.getInputStream());
-		/*vertical scrolling list. Contains following InformationPanel: 
-		  	-premade panel (premade set of informations, like speed, rpm and consommation)
-		  	-speed
-		  	-rpm
-		  	-consommation
-		  	-coolant temperature
-		  	-throttle posisition
-		  	-HP 
-			-fuel system status
-			-Evaporation system pressure
-			-fuel rail pressure
-			-control module voltage
-		*/
+		
 		String[] informations = {	
 			"Pre-made panel", 
 			"Speed", 
@@ -143,7 +165,7 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 		JScrollPane infoScroll = new JScrollPane(infoList);
 		
 		
-		RTIPanel.add(infoList);
+		RTIPanel.add(infoScroll, BorderLayout.WEST);
 		
 		return RTIPanel;
 	}
@@ -164,10 +186,18 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	 * Build the terminal panel.
 	 * @return
 	 */
-	private JTextArea getTerminalPanel(){		
-		terminal = new JTextArea();
+	private JPanel getTerminalPanel(){		
+		JPanel terminal = new JPanel(new BorderLayout());
 		
+		terminalOutput = new JTextField();
+		terminalOutput.addKeyListener(new TerminalOutputKeyListener());
 		
+		terminalInput = new JTextArea();
+		terminalInput.setEditable(false);
+		JScrollPane terminalInputScroller = new JScrollPane(terminalInput);
+		
+		terminal.add(terminalOutput, BorderLayout.SOUTH);
+		terminal.add(terminalInputScroller);
 		
 		return terminal;
 	}

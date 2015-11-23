@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public abstract class ObdCommand {
 	
 	private String command;
+	private float data;
 	private String unit;
 	private ArrayList<Byte> inBuff;
 	private OutputStream out;
@@ -110,6 +111,22 @@ public abstract class ObdCommand {
 	 */
 	public ArrayList<Byte> getInBuff(){
 		return inBuff;
+	}
+	
+	/**
+	 * Getter for data.
+	 * @return
+	 */
+	public float getData(){
+		return data;
+	}
+	
+	/**
+	 * Setter for data.
+	 * @param data
+	 */
+	public void setData(float data){
+		this.data = data;
 	}
 	
 	/**

@@ -9,9 +9,7 @@ import java.io.OutputStream;
  *
  */
 public abstract class PercentageCommand extends ObdCommand{
-	
-	private float percentage;
-	
+		
 	/**
 	 * Default constructor for PercentageCommand. Don't even know what the fuck this is doing here since it's an abstract class though. Plus this is no default constructor at all. Nor are any of the whole program actually. Sigh.
 	 * @param command
@@ -26,6 +24,6 @@ public abstract class PercentageCommand extends ObdCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		percentage = getInBuff().get(0)*100/255;
+		setData(getInBuff().get(0)*100/255);
 	}
 }

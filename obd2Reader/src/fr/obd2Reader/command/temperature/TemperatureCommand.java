@@ -11,9 +11,7 @@ import fr.obd2Reader.command.ObdCommand;
  *
  */
 public class TemperatureCommand extends ObdCommand{
-	
-	private float temperature;
-	
+		
 	/**
 	 * Default constructor for PressureCommand.
 	 * @param command : ASCII encoded version of the command to send to OBD system.
@@ -28,22 +26,7 @@ public class TemperatureCommand extends ObdCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		temperature = getInBuff().get(0) - 40;
+		setData(getInBuff().get(0) - 40);
 	}
 	
-	/**
-	 * Getter for temperature.
-	 * @return
-	 */
-	protected float getTemperature(){
-		return temperature;
-	}
-	
-	/**
-	 * Setter for temperature.
-	 * @param temperature
-	 */
-	protected void setTemperature(float temperature){
-		this.temperature = temperature;
-	}
 }

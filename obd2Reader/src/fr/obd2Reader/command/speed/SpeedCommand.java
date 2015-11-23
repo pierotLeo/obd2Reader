@@ -12,8 +12,6 @@ import fr.obd2Reader.command.ObdCommand;
  */
 public class SpeedCommand extends ObdCommand{
 	
-	private float speed;
-	
 	/**
 	 * Default constructor for FuelRailPressure.
 	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
@@ -27,14 +25,6 @@ public class SpeedCommand extends ObdCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		speed = getInBuff().get(0);
-	}
-	
-	/**
-	 * Getter for speed.
-	 * @return
-	 */
-	public float getSpeed(){
-		return speed;
+		setData(getInBuff().get(0));
 	}
 }

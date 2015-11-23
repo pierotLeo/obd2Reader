@@ -12,8 +12,6 @@ import java.util.ArrayList;
  */
 public class EngineFuelRate extends ObdCommand implements CompatibleCommand{
 
-	private double rate;
-
 	/**
 	 * Default Constructor for EngineFuelRate.
 	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
@@ -31,14 +29,6 @@ public class EngineFuelRate extends ObdCommand implements CompatibleCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		rate = ((getInBuff().get(0)*256) + getInBuff().get(1))*0.05;
-	}
-	
-	/**
-	 * Getter of engine fuel rate.
-	 * @return double : engine fuel rate of the vehicle.
-	 */
-	public double getRate(){
-		return rate;
+		setData((float)(((getInBuff().get(0)*256) + getInBuff().get(1))*0.05));
 	}
 }

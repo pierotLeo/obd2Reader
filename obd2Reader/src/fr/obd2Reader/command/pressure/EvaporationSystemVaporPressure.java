@@ -23,7 +23,7 @@ public class EvaporationSystemVaporPressure extends PressureCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		setPressure(((getInBuff().get(0)*256) + getInBuff().get(1))/4);
+		setData(((getInBuff().get(0)*256) + getInBuff().get(1))/4);
 	}
 
 }

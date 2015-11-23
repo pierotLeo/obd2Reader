@@ -22,7 +22,7 @@ public class ControlModuleVoltageCommand extends VoltageCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		setVoltage(((getInBuff().get(0) * 256) + getInBuff().get(1)) / 1000);
+		setData(((getInBuff().get(0) * 256) + getInBuff().get(1)) / 1000);
 	}
 	
 }

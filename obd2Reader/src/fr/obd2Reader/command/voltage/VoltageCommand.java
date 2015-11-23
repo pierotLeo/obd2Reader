@@ -12,8 +12,6 @@ import fr.obd2Reader.command.ObdCommand;
  */
 public abstract class VoltageCommand extends ObdCommand{
 
-	private double voltage;
-	
 	/**
 	 * Default constructor for PressureCommand.
 	 * @param command : ASCII encoded version of the command to send to OBD system.
@@ -25,21 +23,4 @@ public abstract class VoltageCommand extends ObdCommand{
 		setUnit("V");
 	}
 
-	/**
-	 * Getter for voltage.
-	 * @return
-	 */
-	public double getVoltage(){
-		return voltage;
-	}
-	
-	/**
-	 * Setter for voltage.
-	 * @param voltage
-	 */
-	public void setVoltage(double voltage){
-		this.voltage = voltage;
-	}
-
-	
 }

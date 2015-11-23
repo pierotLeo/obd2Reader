@@ -10,9 +10,7 @@ import fr.obd2Reader.command.ObdCommand;
  * @author Supa Kanojo Hunta
  *
  */
-public abstract class PressureCommand extends ObdCommand{
-	private double pressure;
-	
+public abstract class PressureCommand extends ObdCommand{	
 	/**
 	 * Default constructor for PressureCommand.
 	 * @param command : ASCII encoded version of the command to send to OBD system.
@@ -22,21 +20,5 @@ public abstract class PressureCommand extends ObdCommand{
 	public PressureCommand(String command, OutputStream out, InputStream in){
 		super(command, out, in);
 		setUnit("kPa");
-	}
-	
-	/**
-	 * Getter for pressure.
-	 * @return
-	 */
-	public double getPressure(){
-		return pressure;
-	}
-	
-	/**
-	 * Setter for pressure.
-	 * @param pressure
-	 */
-	public void setPressure(double pressure){
-		this.pressure = pressure;
 	}
 }

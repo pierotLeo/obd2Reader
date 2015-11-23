@@ -19,10 +19,4 @@ public class EngineCoolantTemperatureCommand extends TemperatureCommand{
 		super("01 05", out, in);
 	}
 	
-	public void calculate(){
-		sendCommand();
-		read();
-		setTemperature((float)(getInBuff().get(0)-40));
-	}
-	
 }
