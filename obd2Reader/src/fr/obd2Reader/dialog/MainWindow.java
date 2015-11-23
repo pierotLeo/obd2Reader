@@ -69,7 +69,7 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 		}
 	}
 	
-	private class TerminalKeyListener implements KeyListener{
+	private class TerminalOutputKeyListener implements KeyListener{
 
 		@Override
 		public void keyPressed(KeyEvent arg0) {
