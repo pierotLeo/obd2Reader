@@ -22,6 +22,7 @@ public class TemperatureCommand extends ObdCommand{
 	 */
 	public TemperatureCommand(String command, OutputStream out, InputStream in){
 		super(command, out, in);
+		setUnit("°C");
 	}
 	
 	public void compute(){

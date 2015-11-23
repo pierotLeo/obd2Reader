@@ -20,6 +20,7 @@ public abstract class PercentageCommand extends ObdCommand{
 	 */
 	public PercentageCommand(String command, OutputStream out, InputStream in){
 		super(command, out, in);
+		setUnit("%");
 	}
 
 	public void compute(){

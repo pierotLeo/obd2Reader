@@ -21,6 +21,7 @@ public class EngineFuelRate extends ObdCommand implements CompatibleCommand{
 	 */
 	public EngineFuelRate(OutputStream out, InputStream in){
 		super("01 5E", out, in);
+		setUnit("L/h");
 	}
 	
 	public boolean isCompatible(ArrayList<Byte> vehicleRef){

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public abstract class ObdCommand {
 	
 	private String command;
+	private String unit;
 	private ArrayList<Byte> inBuff;
 	private OutputStream out;
 	private InputStream in;
@@ -109,5 +110,21 @@ public abstract class ObdCommand {
 	 */
 	public ArrayList<Byte> getInBuff(){
 		return inBuff;
+	}
+	
+	/**
+	 * Getter for unit.
+	 * @return
+	 */
+	public String getUnit(){
+		return unit;
+	}
+	
+	/**
+	 * Setter for unit.
+	 * @param unit
+	 */
+	public void setUnit(String unit){
+		this.unit = unit;
 	}
 }

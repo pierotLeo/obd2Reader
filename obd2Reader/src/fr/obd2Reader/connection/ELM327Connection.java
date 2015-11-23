@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressure;
 import fr.obd2Reader.command.speed.SpeedCommand;
-import fr.obd2Reader.driver.BluetoothConnection;
+import fr.obd2Reader.connection.driver.BluetoothConnection;
 
 /**
  * Object encapsuling a bluetooth connection with an ELM327 module.

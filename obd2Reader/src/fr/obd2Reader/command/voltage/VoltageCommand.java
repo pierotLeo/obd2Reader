@@ -22,6 +22,7 @@ public abstract class VoltageCommand extends ObdCommand{
 	 */
 	public VoltageCommand(String command, OutputStream out, InputStream in){
 		super(command, out, in);
+		setUnit("V");
 	}
 
 	/**

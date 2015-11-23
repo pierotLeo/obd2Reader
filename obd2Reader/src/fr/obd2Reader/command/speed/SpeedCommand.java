@@ -21,6 +21,7 @@ public class SpeedCommand extends ObdCommand{
 	 */
 	public SpeedCommand(OutputStream out, InputStream in){
 		super("01 0D", out, in);
+		setUnit("km/h");
 	}
 	
 	public void compute(){

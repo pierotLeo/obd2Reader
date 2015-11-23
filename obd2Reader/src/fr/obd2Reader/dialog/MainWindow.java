@@ -2,9 +2,12 @@ package fr.obd2Reader.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import fr.obd2Reader.command.VehicleCompatibility;
 import fr.obd2Reader.connection.ELM327Connection;
@@ -14,12 +17,54 @@ import fr.obd2Reader.connection.ELM327Connection;
  * @author Supa Kanojo Hunta
  *
  */
-public class MainWindow extends JFrame{
+public class MainWindow extends JFrame implements RTIPanelConstants{
 
 	private VehicleCompatibility vehicle;
 	private ELM327Connection connection;
 	private JTabbedPane tabbedMenu;
 	private JTextArea terminal;
+	
+	private class InfoListListener implements ListSelectionListener{
+		private JList list;
+		
+		public InfoListListener (JList list){
+			this.list = list;
+		}
+		
+		public void valueChanged(ListSelectionEvent e){
+			if(e.getValueIsAdjusting()){
+				
+				switch(list.getSelectedIndex()){
+					case NO_SELECTION :
+						break;
+					case PRE_MADE_PANEL :
+						break;
+					case SPEED :
+						break;
+					case RPM :
+						break;
+					case CONSOMATION :
+						break;
+					case COOLANT_TEMPERATURE :
+						break;
+					case THROTTLE_POSITION :
+						break;
+					case HP :
+						break;
+					case FUEL_SYSTEM_STATUS :
+						break;
+					case EVAPORATION_SYSTEM_PRESSURE :
+						break;
+					case FUEL_RAIL_PRESSURE :
+						break;
+					case CONTROL_MODULE_VOLTAGE :
+						break;
+					default :
+						break;
+				}
+			}
+		}
+	}
 	
 	/**
 	 * Default constructor for MainWindow.
@@ -63,7 +108,7 @@ public class MainWindow extends JFrame{
 	 * @return
 	 */
 	private JPanel getRTIPanel(){
-		JPanel RTIPanel = new JPanel();
+		JPanel RTIPanel = new JPanel(new GridLayout(1,2));
 		
 		vehicle = new VehicleCompatibility(connection.getOutputStream(), connection.getInputStream());
 		/*vertical scrolling list. Contains following InformationPanel: 
@@ -79,6 +124,26 @@ public class MainWindow extends JFrame{
 			-fuel rail pressure
 			-control module voltage
 		*/
+		String[] informations = {	
+			"Pre-made panel", 
+			"Speed", 
+			"RPM", 
+			"Consomation", 
+			"Coolant temperature", 
+			"Throttle position", 
+			"HP", 
+			"Fuel system status",
+			"Evaporation system pressure",
+			"Fuel rail pressure",
+			"Control module voltage"};
+		JList<String> infoList = new JList<String>(informations);
+		infoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		infoList.addListSelectionListener(new InfoListListener(infoList));
+
+		JScrollPane infoScroll = new JScrollPane(infoList);
+		
+		
+		RTIPanel.add(infoList);
 		
 		return RTIPanel;
 	}

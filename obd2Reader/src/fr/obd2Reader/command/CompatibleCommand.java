@@ -14,6 +14,7 @@ public interface CompatibleCommand {
 	 * @param vehicleRef : Compatibility reference of the system in use. The byte encoding current command compatibility's must be active (1) to be understood by the vehicle's OBD system.
 	 * @return boolean : true if the command is compatible with the system, else false.
 	 */
-	public abstract boolean isCompatible(ArrayList<Byte> vehicleRef);
-	
+	public boolean isCompatible(ArrayList<Byte> vehicleRef);
+	public void compute();
+	public String getUnit();
 }

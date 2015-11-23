@@ -21,6 +21,7 @@ public abstract class PressureCommand extends ObdCommand{
 	 */
 	public PressureCommand(String command, OutputStream out, InputStream in){
 		super(command, out, in);
+		setUnit("kPa");
 	}
 	
 	/**

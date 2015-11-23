@@ -17,6 +17,7 @@ public class EvaporationSystemVaporPressure extends PressureCommand{
 	 */
 	public EvaporationSystemVaporPressure(OutputStream out, InputStream in){
 		super("01 32", out, in);
+		setUnit("Pa");
 	}
 	
 	public void compute(){
