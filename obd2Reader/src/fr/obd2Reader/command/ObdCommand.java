@@ -144,4 +144,8 @@ public abstract class ObdCommand {
 	public void setUnit(String unit){
 		this.unit = unit;
 	}
+	
+	public String toString(){
+		return data + " " + unit;
+	}
 }

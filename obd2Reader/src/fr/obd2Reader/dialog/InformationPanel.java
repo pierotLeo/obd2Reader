@@ -7,6 +7,7 @@ import javax.swing.*;
 import fr.obd2Reader.command.CompatibleCommand;
 import fr.obd2Reader.command.VehicleCompatibility;
 import fr.obd2Reader.command.ObdCommand;
+import fr.obd2Reader.connection.ELM327Connection;
 
 /**
  * Panel containing one information of the vehicle.
@@ -18,6 +19,11 @@ public class InformationPanel extends JPanel{
 	private String name;
 	private CompatibleCommand command;
 	private VehicleCompatibility vehicle;
+	private JTextArea DataTextArea;
+	
+	public InformationPanel(VehicleCompatibility vehicle){
+		this.vehicle = vehicle;
+	}
 	
 	/**
 	 * Constructor for InformationPanel.
@@ -71,8 +77,8 @@ public class InformationPanel extends JPanel{
 	private JTabbedPane getDisplayMode(){
 		JTabbedPane displayMode = new JTabbedPane();
 		
-		displayMode.addTab("Graphic", getGraphPanel());
-		displayMode.addTab("Numeric", getNumericPanel());
+		displayMode.addTab("Graphic", drawGraphicPanel());
+		displayMode.addTab("Numeric", drawNumericPanel());
 
 		return displayMode;
 	}
@@ -81,7 +87,7 @@ public class InformationPanel extends JPanel{
 	 * Build graphic representation of the information.
 	 * @return
 	 */
-	private JPanel getGraphPanel(){
+	private JPanel drawGraphicPanel(){
 		JPanel graphicPanel = new JPanel();
 		
 		
@@ -90,15 +96,49 @@ public class InformationPanel extends JPanel{
 	}
 	
 	/**
+	 * Add a new data to the graphic representation's set of datas and update it.
+	 * @param newData : data to update representation with.
+	 */
+	public void updateGraphicPanel(float newData){
+		
+	}
+	
+	/**
 	 * Build numeric representation of the information.
 	 * @return
 	 */
-	private JPanel getNumericPanel(){
-		JPanel numericPanel = new JPanel();
+	private JPanel drawNumericPanel(){
+		JPanel numericPanel = new JPanel(new BorderLayout());
 		
+		DataTextArea = new JTextArea();
 		
+		numericPanel.add(DataTextArea, BorderLayout.CENTER);
+		numericPanel.add(new JTextArea(command.getUnit()),BorderLayout.SOUTH);
 		
 		return numericPanel;
 	}
+
+	/**
+	 * Add a new data to the numeric representation's set of datas and update it.
+	 * @param newData : data to update representation with.
+	 */
+	public void updateNumericPanel(float newData){
+		DataTextArea.setText(String.valueOf(newData));
+	}
 	
+	/**
+	 * Getter for the command.
+	 * @return
+	 */
+	public CompatibleCommand getCommand(){
+		return command;
+	}
+	
+	public void setCommand(CompatibleCommand command){
+		this.command = command;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
 }

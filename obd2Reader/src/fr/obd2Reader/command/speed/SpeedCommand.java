@@ -2,7 +2,9 @@ package fr.obd2Reader.command.speed;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
+import fr.obd2Reader.command.CompatibleCommand;
 import fr.obd2Reader.command.ObdCommand;
 
 /**
@@ -10,7 +12,7 @@ import fr.obd2Reader.command.ObdCommand;
  * @author Supa Kanojo Hunta
  *
  */
-public class SpeedCommand extends ObdCommand{
+public class SpeedCommand extends ObdCommand implements CompatibleCommand{
 	
 	/**
 	 * Default constructor for FuelRailPressure.
@@ -26,5 +28,10 @@ public class SpeedCommand extends ObdCommand{
 		sendCommand();
 		read();
 		setData(getInBuff().get(0));
+	}
+
+	@Override
+	public boolean isCompatible(ArrayList<Byte> vehicleRef) {
+		return false;
 	}
 }
