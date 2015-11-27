@@ -16,7 +16,7 @@ public class EngineCoolantTemperatureCommand extends TemperatureCommand implemen
 	public void compute(){
 		sendCommand();
 		read();
-		setTemperature((float)(getInBuff().get(0)-40));
+		setData((float)(getInBuff().get(0)-40));
 	}
 
 	@Override

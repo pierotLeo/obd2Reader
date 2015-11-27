@@ -7,6 +7,7 @@ public abstract class PercentageCommand extends ObdCommand{
 		
 	public PercentageCommand(String command, String name, OutputStream out, InputStream in){
 		super(command, name, out, in);
+		setUnit("%");
 	}
 	
 	public void compute(){

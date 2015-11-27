@@ -8,11 +8,10 @@ import fr.obd2Reader.command.CompatibleCommand;
 import fr.obd2Reader.command.ObdCommand;
 
 public class SpeedCommand extends ObdCommand implements CompatibleCommand{
-	
-	private float speed;
-	
+		
 	public SpeedCommand(OutputStream out, InputStream in){
 		super("01 0D", "Speed", out, in);
+		setUnit("km/h");
 	}
 	
 	public boolean isCompatible(ArrayList<Byte> vehicleRef){
@@ -22,10 +21,7 @@ public class SpeedCommand extends ObdCommand implements CompatibleCommand{
 	public void compute(){
 		sendCommand();
 		read();
-		speed = getInBuff().get(0);
+		setData(getInBuff().get(0));
 	}
-	
-	public float getSpeed(){
-		return speed;
-	}
+
 }

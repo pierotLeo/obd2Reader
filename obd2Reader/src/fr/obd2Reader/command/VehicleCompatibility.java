@@ -18,9 +18,10 @@ public class VehicleCompatibility extends ObdCommand{
 			sendCommand("01" + i*2 + "0");
 			read();
 		}
-		for(int i=4; i>=0; i--){
-			getInBuff().remove(6*i);
-			getInBuff().remove(6*i);
+		for(int i = 4; i >= 0; i--){
+			for(int j = 0; j < 2; j++){
+				getInBuff().remove(6*i);
+			}
 		}
 	}
 	

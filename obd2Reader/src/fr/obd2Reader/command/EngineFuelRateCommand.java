@@ -6,11 +6,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class EngineFuelRateCommand extends ObdCommand implements CompatibleCommand{
-
-	private double rate;
 	
 	public EngineFuelRateCommand(OutputStream out, InputStream in){
 		super("01 5E", "Engine Fuel Rate", out, in);
+		setUnit("L/h");
 	}
 	
 	public boolean isCompatible(ArrayList<Byte> vehicleRef){
@@ -20,10 +19,7 @@ public class EngineFuelRateCommand extends ObdCommand implements CompatibleComma
 	public void compute(){
 		sendCommand();
 		read();
-		rate = ((getInBuff().get(0)*256) + getInBuff().get(1))*0.05;
+		setData((float)(((getInBuff().get(0)*256) + getInBuff().get(1))*0.05));
 	}
-	
-	public double getRate(){
-		return rate;
-	}
+
 }

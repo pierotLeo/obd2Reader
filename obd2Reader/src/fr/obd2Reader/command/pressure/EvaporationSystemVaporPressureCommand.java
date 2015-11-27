@@ -10,12 +10,13 @@ public class EvaporationSystemVaporPressureCommand extends PressureCommand imple
 	
 	public EvaporationSystemVaporPressureCommand(OutputStream out, InputStream in){
 		super("01 32", "Evaporation System Pressure", out, in);
+		setUnit("Pa");
 	}
 	
 	public void compute(){
 		sendCommand();
 		read();
-		setPressure(((getInBuff().get(0)*256) + getInBuff().get(1))/4);
+		setData(((getInBuff().get(0)*256) + getInBuff().get(1))/4);
 	}
 
 	@Override

@@ -15,7 +15,7 @@ public class FuelRailPressureCommand extends PressureCommand implements Compatib
 	public void compute(){
 		sendCommand();
 		read();
-		setPressure(((getInBuff().get(0) * 256) + getInBuff().get(1)) * 0.079);
+		setData((float)(((getInBuff().get(0) * 256) + getInBuff().get(1)) * 0.079));
 	}
 
 	@Override
