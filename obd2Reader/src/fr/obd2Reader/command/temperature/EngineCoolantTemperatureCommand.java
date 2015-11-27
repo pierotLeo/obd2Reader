@@ -2,21 +2,26 @@ package fr.obd2Reader.command.temperature;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
-/**
- * An OBD command getting engine coolant temperature of the vehicle.
- * @author Supa Kanojo Hunta
- *
- */
-public class EngineCoolantTemperatureCommand extends TemperatureCommand{
+import fr.obd2Reader.command.CompatibleCommand;
+
+
+public class EngineCoolantTemperatureCommand extends TemperatureCommand implements CompatibleCommand{
 	
-	/**
-	 * Default constructor for FuelRailPressure.
-	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
-	 * @param in : InputStream of a pre-established connection. Used to read information from connection's other end.
-	 */
 	public EngineCoolantTemperatureCommand(OutputStream out, InputStream in){
-		super("01 05", out, in);
+		super("01 05", "Engine Coolant Temperature", out, in);
+	}
+	
+	public void compute(){
+		sendCommand();
+		read();
+		setTemperature((float)(getInBuff().get(0)-40));
+	}
+
+	@Override
+	public boolean isCompatible(ArrayList<Byte> vehicleRef) {
+		return false;
 	}
 	
 }

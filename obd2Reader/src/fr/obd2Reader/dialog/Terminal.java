@@ -2,15 +2,11 @@ package fr.obd2Reader.dialog;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressure;
+import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressureCommand;
 import fr.obd2Reader.command.speed.SpeedCommand;
-import fr.obd2Reader.connection.driver.BluetoothConnection;
+import fr.obd2Reader.driver.BluetoothConnection;
 
-/**
- * Useless piece of crap that eventually work. Sometimes.
- * @author Supa Kanojo Hunta
- *
- */
+
 public class Terminal {
 
 	private BluetoothConnection btConnection;
@@ -121,7 +117,7 @@ public class Terminal {
 						}
 						break;
 					case 3:
-						EvaporationSystemVaporPressure esvp = new EvaporationSystemVaporPressure(btConnection.getOutputStream(), btConnection.getInputStream());
+						EvaporationSystemVaporPressureCommand esvp = new EvaporationSystemVaporPressureCommand(btConnection.getOutputStream(), btConnection.getInputStream());
 						esvp.compute();
 						System.out.println("Pression de la vapeur des système d'évaporation = " + esvp.getPressure() + " Pa.");
 						break;

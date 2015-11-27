@@ -2,27 +2,25 @@ package fr.obd2Reader.command.voltage;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
-/**
- * An OBD command getting control module voltage of the vehicle.
- * @author Supa Kanojo Hunta
- *
- */
-public class ControlModuleVoltageCommand extends VoltageCommand{
+import fr.obd2Reader.command.CompatibleCommand;
 
-	/**
-	 * Default constructor for ControlModuleVoltageCommand.
-	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
-	 * @param in : InputStream of a pre-established connection. Used to read information from connection's other end.
-	 */
+public class ControlModuleVoltageCommand extends VoltageCommand implements CompatibleCommand{
+
 	public ControlModuleVoltageCommand(OutputStream out, InputStream in){
-		super("01 42", out, in);
+		super("01 42", "Control Module Voltage", out, in);
 	}
 	
 	public void compute(){
 		sendCommand();
 		read();
-		setData(((getInBuff().get(0) * 256) + getInBuff().get(1)) / 1000);
+		setVoltage(((getInBuff().get(0) * 256) + getInBuff().get(1)) / 1000);
+	}
+
+	@Override
+	public boolean isCompatible(ArrayList<Byte> vehicleRef) {
+		return false;
 	}
 	
 }

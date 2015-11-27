@@ -4,54 +4,37 @@ package fr.obd2Reader.command;
 import java.io.*;
 import java.util.ArrayList;
 
-/**
- * Mother-class of an OBD command. 
- * @author Supa Kanojo Hunta
- *
- */
 public abstract class ObdCommand {
 	
 	private String command;
-	private float data;
+	private String name;
 	private String unit;
+	private float data;
 	private ArrayList<Byte> inBuff;
 	private OutputStream out;
 	private InputStream in;
 	
-	/**
-	 * Constructor for ObdCommand.
-	 * @param command : ASCII encoded version of the command to send to OBD system.
-	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
-	 * @param in : InputStream of a pre-established connection. Used to read information from connection's other end.
-	 */
-	public ObdCommand(String command, OutputStream out, InputStream in){
+	public ObdCommand(){
+		
+	}
+	
+	public ObdCommand(String command, String name, OutputStream out, InputStream in){
 		this.command = command;
+		this.name = name;
 		this.inBuff = new ArrayList<Byte>();
 		this.out = out;
 		this.in = in;
 	}
 	
-	//to rework. Numerous commands should be imploded into one string, separated by a specific character. Then split up and send separately.
-	/**
-	 * Constructor for ObdCommand. Used when an OBDCommand must send numerous request to be fulfilled.
-	 * @param out : OutputStream of a pre-established connection. Used to Write information to connection's other end.
-	 * @param in : InputStream of a pre-established connection. Used to read information from connection's other end.
-	 */
 	public ObdCommand(OutputStream out, InputStream in){
 		this.inBuff = new ArrayList<Byte>();
 		this.out = out;
 		this.in = in;
 	}
 	
-	/**
-	 * Decode sent information from OBD system before storing it.
-	 */
 	public abstract void compute();
 	
-	/**
-	 * Send a request to OBD system.
-	 */
-	protected void sendCommand(){
+	public void sendCommand(){
 		try {
 			out.write((command+"\r").getBytes());
 			out.flush();
@@ -60,12 +43,7 @@ public abstract class ObdCommand {
 		}
 	}
 	
-	//As specified above, to rework. This is probably where the string should be split up.
-	/**
-	 * Send a request to OBD system. Used when numerous requests are required.
-	 * @param cmd :  request to send to OBD system.
-	 */
-	protected void sendCommand(String cmd){
+	public void sendCommand(String cmd){
 		try{
 			out.write((cmd + "\r").getBytes());
 			out.flush();
@@ -74,10 +52,7 @@ public abstract class ObdCommand {
 		}
 	}
 	
-	/**
-	 * Read information from OBD system and store it into a byte buffer.
-	 */
-	protected void read(){
+	public void read(){
 		try{
 			char currentRead = ' ';
 			while(!Character.toString(currentRead).equals(">")){
@@ -89,60 +64,40 @@ public abstract class ObdCommand {
 		}
 	}
 	
-	/**
-	 * Getter for the input stream.
-	 * @return 
-	 */
-	public InputStream getInputStream(){
+	public InputStream getIn(){
 		return in;
 	}
 	
-	/**
-	 * Getter for the output stream.
-	 * @return
-	 */
-	public OutputStream getOutputStream(){
+	public OutputStream getOut(){
 		return out;
 	}
 	
-	/**
-	 * Getter for input stream buffer.
-	 * @return
-	 */
+	public String getName(){
+		return name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
+	
 	public ArrayList<Byte> getInBuff(){
 		return inBuff;
 	}
 	
-	/**
-	 * Getter for data.
-	 * @return
-	 */
-	public float getData(){
-		return data;
-	}
-	
-	/**
-	 * Setter for data.
-	 * @param data
-	 */
-	public void setData(float data){
-		this.data = data;
-	}
-	
-	/**
-	 * Getter for unit.
-	 * @return
-	 */
 	public String getUnit(){
 		return unit;
 	}
 	
-	/**
-	 * Setter for unit.
-	 * @param unit
-	 */
 	public void setUnit(String unit){
 		this.unit = unit;
+	}
+	
+	public float getData(){
+		return data;
+	}
+	
+	public void setData(float data){
+		this.data = data;
 	}
 	
 	public String toString(){

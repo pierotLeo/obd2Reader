@@ -1,6 +1,8 @@
 package fr.obd2Reader.dialog;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -12,8 +14,23 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+import fr.obd2Reader.command.FuelSystemStatusCommand;
 import fr.obd2Reader.command.VehicleCompatibility;
+import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressureCommand;
+import fr.obd2Reader.command.pressure.FuelRailPressureCommand;
 import fr.obd2Reader.command.speed.SpeedCommand;
+import fr.obd2Reader.command.temperature.EngineCoolantTemperatureCommand;
+import fr.obd2Reader.command.voltage.ControlModuleVoltageCommand;
 import fr.obd2Reader.connection.ELM327Connection;
 
 /**
@@ -38,19 +55,24 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	private class UpdateInformations implements Runnable{
 		
 		public synchronized void run(){
+			double time = 0;
 			while(true){
 				try {
 					if(currentInfoPanelIsDisplayed){
 						currentInfoPanel.getCommand().compute();
 						currentInfoPanel.updateNumericPanel(currentInfoPanel.getCommand().getData());
+						currentInfoPanel.updateGraphicPanel(currentInfoPanel.getCommand().getData(), time);
 						wait(250);
+						time += 0.25;
 					}
 					else if(customInfoPanelIsDisplayed){
 						for(int i = 0; i < customInfoPanel.size(); i++){
 							customInfoPanel.get(i).getCommand().compute();
 							customInfoPanel.get(i).updateNumericPanel(customInfoPanel.get(i).getCommand().getData());
-							wait(250);
+							customInfoPanel.get(i).updateGraphicPanel(customInfoPanel.get(i).getCommand().getData(), time);
 						}
+						wait(250);
+						time += 0.25;
 					}
 					else
 						informationsUpdate.interrupt();
@@ -63,9 +85,9 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	}
 	
 	private class InfoListListener implements ListSelectionListener{
-		private JList list;
+		private JList<String> list;
 		
-		public InfoListListener (JList list){
+		public InfoListListener (JList<String> list){
 			this.list = list;
 		}
 		
@@ -95,26 +117,37 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 								
 								switch(list.getSelectedIndex()){						
 									case SPEED :
-										currentInfoPanel.setName("Speed");
 										currentInfoPanel.setCommand(new SpeedCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case RPM :
+										currentInfoPanel.setCommand(new RPMCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case CONSOMATION :
+										currentInfoPanel.setCommand(new ConsommationCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case COOLANT_TEMPERATURE :
+										currentInfoPanel.setCommand(new EngineCoolantTemperatureCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case THROTTLE_POSITION :
+										currentInfoPanel.setCommand(new ThrottlePositionCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case HP :
+										currentInfoPanel.setCommand(new HPCommand(connection.getOutputStream(), connection.getInputStream()))
 										break;
+										//Should not exist in this form. Does not have a float type data /!\ Find something or kick it back to hell.
+										/*
 									case FUEL_SYSTEM_STATUS :
+										currentInfoPanel.setCommand(new FuelSystemStatusCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
+										*/
 									case EVAPORATION_SYSTEM_PRESSURE :
+										currentInfoPanel.setCommand(new EvaporationSystemVaporPressureCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case FUEL_RAIL_PRESSURE :
+										currentInfoPanel.setCommand(new FuelRailPressureCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case CONTROL_MODULE_VOLTAGE :
+										currentInfoPanel.setCommand(new ControlModuleVoltageCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									default :
 										currentInfoPanelIsDisplayed = false;
@@ -136,8 +169,8 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 				case KeyEvent.VK_ENTER:
 					terminalInput.append(terminalOutput.getText() + "\n");
 					
-					connection.send(terminalOutput.getText());
-					terminalInput.append(connection.read() + "\n");
+					//connection.send(terminalOutput.getText());
+					//terminalInput.append(connection.read() + "\n");
 					
 					terminalOutput.setText("");
 					break;
@@ -176,7 +209,7 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	 * Fill the main window with a tabbed panel, containing 3 features for now.
 	 */
 	private void initiate(){
-		connection = new ELM327Connection();
+		//connection = new ELM327Connection();
 		add(getCenterPanel(), BorderLayout.CENTER);
 	}
 	
@@ -212,17 +245,17 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 				"Fuel system status",
 				"Evaporation system pressure",
 				"Fuel rail pressure",
-		"Control module voltage"};
+				"Control module voltage"};
 		JList<String> infoList = new JList<String>(informations);
 		infoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		infoList.addListSelectionListener(new InfoListListener(infoList));
+		//infoList.addListSelectionListener(new InfoListListener(infoList));
 		
 		JScrollPane infoScroll = new JScrollPane(infoList);		
 		
-		vehicle = new VehicleCompatibility(connection.getOutputStream(), connection.getInputStream());
-		currentInfoPanel = new InformationPanel(vehicle);
+		vehicle = new VehicleCompatibility();//connection.getOutputStream(), connection.getInputStream());
+		currentInfoPanel = new InformationPanel(vehicle, "Current Displayed Information");
 		
-		
+		RTIPanel.add(currentInfoPanel);
 		RTIPanel.add(infoScroll, BorderLayout.WEST);
 		
 		return RTIPanel;
@@ -240,7 +273,7 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 		return errorCodesPanel;
 	}
 	
-	/**
+	/**  
 	 * Build the terminal panel.
 	 * @return
 	 */
