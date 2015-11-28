@@ -4,11 +4,18 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -38,7 +45,7 @@ import fr.obd2Reader.connection.ELM327Connection;
  * @author Supa Kanojo Hunta
  *
  */
-public class MainWindow extends JFrame implements RTIPanelConstants{
+public class MainWindow extends JFrame implements RTIPanelConstants, TerminalControllerConstants{
 
 	private VehicleCompatibility vehicle;
 	private ELM327Connection connection;
@@ -161,6 +168,13 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	
 	private class TerminalOutputKeyListener implements KeyListener{
 
+		private TerminalController terminalController;
+		
+		public TerminalOutputKeyListener(TerminalController terminalController){
+			super();
+			this.terminalController = terminalController;
+		}
+		
 		@Override
 		public void keyPressed(KeyEvent arg0) {
 			int action = arg0.getKeyCode();
@@ -169,8 +183,15 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 				case KeyEvent.VK_ENTER:
 					terminalInput.append(terminalOutput.getText() + "\n");
 					
-					//connection.send(terminalOutput.getText());
-					//terminalInput.append(connection.read() + "\n");
+					/*switch(terminalController.analyzeInput(request)){
+					case MISC_REQUEST:
+						terminalController.send(request);
+						terminalInput.append(terminalController.read() + "\n");
+						break;
+					case IS_COMPATIBLE_MAN:
+						terminalInput.append(terminalController.getIsCompatibleMan() + "\n");
+						break;
+				}*/
 					
 					terminalOutput.setText("");
 					break;
@@ -200,16 +221,59 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 		int height = (int)itemWindowDim.getHeight();
 		int width = (int)itemWindowDim.getWidth();
 		this.setBounds(width/2-width/4, height/2-height/4, width/2, height/2);
+		UIManagerCustom();
 		initiate();
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+	
+	private void UIManagerCustom(){
+		this.setBackground(Color.DARK_GRAY);
+		Color darkGreen = new Color(50,100,50);
+		UIManager.put("TabbedPane.highlight", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.light", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.darkShadow", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.shadow", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.selected", darkGreen);
+		UIManager.put("TabbedPane.focus",  darkGreen);
+		UIManager.put("TabbedPane.borderHightlightColor", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.contentAreaColor", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.background", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.selectHighlight", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.selectedLight", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.tabAreaBackground", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.unselectedBackground", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.unselectedTabBackground", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.unselectedTabHighlight", Color.DARK_GRAY);
+		UIManager.put("TabbedPane.unselectedTabShadow", Color.DARK_GRAY);
+		
+		UIManager.put("List.selectionBackground", darkGreen);
+		UIManager.put("List.selectionForeground", Color.GREEN);
+		UIManager.put("List.focus", Color.DARK_GRAY);
+		
+		UIManager.put("TextField.border", BorderFactory.createMatteBorder(1, 1, 1, 1,Color.DARK_GRAY));
+		UIManager.put("TextField.background", darkGreen);
+		UIManager.put("TextField.caretForeground", Color.GREEN);
+		UIManager.put("TextField.caretBlinkRate", 1000);
+		
+		UIManager.put("TextArea.border", BorderFactory.createMatteBorder(1, 1, 1, 1,Color.DARK_GRAY));
+		
 	}
 	
 	/**
 	 * Fill the main window with a tabbed panel, containing 3 features for now.
 	 */
 	private void initiate(){
-		//connection = new ELM327Connection();
+		//connection = new ELM327Connection();		
+
+		try {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			Font terminalLikeFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/fr/obd2Reader/dialog/ShareTechMono_Regular.ttf"));
+			ge.registerFont(terminalLikeFont);
+		} catch (FontFormatException | IOException e) {
+			e.printStackTrace();
+		}
+		
 		add(getCenterPanel(), BorderLayout.CENTER);
 	}
 	
@@ -223,6 +287,10 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 		tabbedMenu.addTab("Real time informations", getRTIPanel());
 		tabbedMenu.addTab("Vehicle error codes", getErrorCodesPanel());
 		tabbedMenu.addTab("Terminal", getTerminalPanel());
+		tabbedMenu.setOpaque(true);
+		tabbedMenu.setBackground(Color.DARK_GRAY);
+		tabbedMenu.setForeground(Color.GREEN);
+		tabbedMenu.setFont(new Font("Share Tech Mono", Font.PLAIN, 15));
 		
 		return tabbedMenu;
 	}
@@ -248,6 +316,10 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 				"Control module voltage"};
 		JList<String> infoList = new JList<String>(informations);
 		infoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		infoList.setBackground(Color.DARK_GRAY);
+		infoList.setForeground(Color.GREEN);
+		infoList.setFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
+		
 		//infoList.addListSelectionListener(new InfoListListener(infoList));
 		
 		JScrollPane infoScroll = new JScrollPane(infoList);		
@@ -279,12 +351,21 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	 */
 	private JPanel getTerminalPanel(){		
 		JPanel terminal = new JPanel(new BorderLayout());
+		//TerminalController terminalController = new TerminalController(connection);
+		TerminalController terminalController = new TerminalController();
+
 		
 		terminalOutput = new JTextField();
-		terminalOutput.addKeyListener(new TerminalOutputKeyListener());
+		terminalOutput.addKeyListener(new TerminalOutputKeyListener(terminalController));
+		terminalOutput.setForeground(Color.GREEN);
+		terminalOutput.putClientProperty("caretWidth", 7);
+		terminalOutput.setFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
 		
 		terminalInput = new JTextArea();
 		terminalInput.setEditable(false);
+		terminalInput.setBackground(Color.DARK_GRAY);
+		terminalInput.setForeground(Color.GREEN);
+		terminalInput.setFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
 		JScrollPane terminalInputScroller = new JScrollPane(terminalInput);
 		
 		terminal.add(terminalOutput, BorderLayout.SOUTH);
@@ -296,4 +377,5 @@ public class MainWindow extends JFrame implements RTIPanelConstants{
 	public static void main(String[] args){
 		MainWindow main = new MainWindow();
 	}
+
 }

@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import fr.obd2Reader.command.pressure.EvaporationSystemVaporPressure;
-import fr.obd2Reader.command.speed.SpeedCommand;
 import fr.obd2Reader.connection.driver.BluetoothConnection;
 
 /**

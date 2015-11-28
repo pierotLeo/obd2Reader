@@ -1,4 +1,4 @@
-package fr.obd2Reader.driver;
+package fr.obd2Reader.connection.driver;
 
 import java.io.IOException;
 import java.io.InputStream;
