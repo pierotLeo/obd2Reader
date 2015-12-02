@@ -10,7 +10,7 @@ public abstract class ObdCommand {
 	private String name;
 	private String unit;
 	private float data;
-	private ArrayList<Byte> inBuff;
+	private ArrayList<Short> inBuff;
 	private OutputStream out;
 	private InputStream in;
 	
@@ -21,13 +21,13 @@ public abstract class ObdCommand {
 	public ObdCommand(String command, String name, OutputStream out, InputStream in){
 		this.command = command;
 		this.name = name;
-		this.inBuff = new ArrayList<Byte>();
+		this.inBuff = new ArrayList<Short>();
 		this.out = out;
 		this.in = in;
 	}
 	
 	public ObdCommand(OutputStream out, InputStream in){
-		this.inBuff = new ArrayList<Byte>();
+		this.inBuff = new ArrayList<Short>();
 		this.out = out;
 		this.in = in;
 	}
@@ -54,10 +54,23 @@ public abstract class ObdCommand {
 	
 	public void read(){
 		try{
-			char currentRead = ' ';
-			while(!Character.toString(currentRead).equals(">")){
-				currentRead = (char)in.read();
-				inBuff.add(Byte.parseByte(Character.toString(currentRead), 16));
+			String fullByteString = "";
+			char currentReadChar = ' ';
+			int indexOfAnswer = 0;
+			while(!Character.toString(currentReadChar).equals(">")){
+				currentReadChar = (char)in.read();
+				if(currentReadChar == 'S'){
+					for(int i = 0; i < 10; i++)
+						currentReadChar = (char)in.read();
+				}
+				if(Character.toString(currentReadChar).matches("^[a-fA-F0-9]$")){
+					indexOfAnswer++;
+					fullByteString += Character.toString(currentReadChar);
+					if(indexOfAnswer%2 == 0 && indexOfAnswer != 0){
+						inBuff.add(Short.parseShort(fullByteString, 16));
+						fullByteString = "";
+					}
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -80,7 +93,7 @@ public abstract class ObdCommand {
 		this.name = name;
 	}
 	
-	public ArrayList<Byte> getInBuff(){
+	public ArrayList<Short> getInBuff(){
 		return inBuff;
 	}
 	

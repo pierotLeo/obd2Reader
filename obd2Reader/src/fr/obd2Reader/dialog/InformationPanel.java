@@ -24,6 +24,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import fr.obd2Reader.command.CompatibilityTestableCommand;
 import fr.obd2Reader.command.CompatibleCommand;
 import fr.obd2Reader.command.VehicleCompatibility;
 import fr.obd2Reader.command.ObdCommand;
@@ -37,7 +38,7 @@ import fr.obd2Reader.connection.ELM327Connection;
 public class InformationPanel extends JTabbedPane{
 
 	private String name;
-	private CompatibleCommand command;
+	private CompatibilityTestableCommand command;
 	private VehicleCompatibility vehicle;
 	private JTextArea DataTextArea;
 	private XYSeries dataCurve;
@@ -56,22 +57,12 @@ public class InformationPanel extends JTabbedPane{
 	 * @param command : Command affiliated with the information.
 	 * @param vehicle : PID's compatibility of the vehicle. 
 	 */
-	public InformationPanel(String name, CompatibleCommand command, VehicleCompatibility vehicle){
+	public InformationPanel(String name, CompatibilityTestableCommand command, VehicleCompatibility vehicle){
 		super();
 		this.name = name;
 		this.command = command;
 		this.vehicle = vehicle;	
 		initiate();
-	}
-	
-	//might be better to test that lower into command classes hierarchy. Don't really know where for now though.
-	/**
-	 * Test compatibility of the information with the vehicle.
-	 * @return
-	 */
-	private boolean checkCompatibility(){
-		vehicle.compute();
-		return command.isCompatible(vehicle.getInBuff());
 	}
 	
 	/**
@@ -81,16 +72,13 @@ public class InformationPanel extends JTabbedPane{
 	 */
 	private void initiate(){
 		
-		//if(!checkCompatibility())
-			//this.addTab(new JLabel("No data available"));
-		//else{
-			this.addTab("Graphic", drawGraphicPanel());
-			this.addTab("Numeric", drawNumericPanel());
-			this.setOpaque(true);
-			this.setBackground(Color.DARK_GRAY);
-			this.setForeground(Color.GREEN);
-			this.setFont(new Font("Share Tech Mono", Font.PLAIN, 15));
-		//}
+		this.addTab("Graphic", drawGraphicPanel());
+		this.addTab("Numeric", drawNumericPanel());
+		this.setOpaque(true);
+		this.setBackground(Color.DARK_GRAY);
+		this.setForeground(Color.GREEN);
+		this.setFont(new Font("Share Tech Mono", Font.PLAIN, 15));
+		
 	}
 	
 	private ChartPanel drawGraphicPanel(){
@@ -179,11 +167,11 @@ public class InformationPanel extends JTabbedPane{
 	 * Getter for the command.
 	 * @return
 	 */
-	public CompatibleCommand getCommand(){
+	public CompatibilityTestableCommand getCommand(){
 		return command;
 	}
 	
-	public void setCommand(CompatibleCommand command){
+	public void setCommand(CompatibilityTestableCommand command){
 		this.command = command;
 		this.name = command.getName();
 	}

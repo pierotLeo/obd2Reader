@@ -3,7 +3,7 @@ package fr.obd2Reader.command;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public abstract class PercentageCommand extends ObdCommand{
+public abstract class PercentageCommand extends CompatibilityTestableCommand{
 		
 	public PercentageCommand(String command, String name, OutputStream out, InputStream in){
 		super(command, name, out, in);

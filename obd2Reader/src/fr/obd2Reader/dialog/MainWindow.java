@@ -65,7 +65,7 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 			double time = 0;
 			while(true){
 				try {
-					if(currentInfoPanelIsDisplayed){
+					/*if(currentInfoPanelIsDisplayed){
 						currentInfoPanel.getCommand().compute();
 						currentInfoPanel.updateNumericPanel(currentInfoPanel.getCommand().getData());
 						currentInfoPanel.updateGraphicPanel(currentInfoPanel.getCommand().getData(), time);
@@ -82,7 +82,13 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 						time += 0.25;
 					}
 					else
-						informationsUpdate.interrupt();
+						informationsUpdate.interrupt();*/
+					currentInfoPanel.setCommand(new SpeedCommand(connection.getOutputStream(), connection.getInputStream()));
+					currentInfoPanel.getCommand().compute();
+					currentInfoPanel.updateNumericPanel(currentInfoPanel.getCommand().getData());
+					currentInfoPanel.updateGraphicPanel(currentInfoPanel.getCommand().getData(), time);
+					time += 0.25;
+					wait(250);
 					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -127,19 +133,19 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 										currentInfoPanel.setCommand(new SpeedCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case RPM :
-										currentInfoPanel.setCommand(new RPMCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new RPMCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case CONSOMATION :
-										currentInfoPanel.setCommand(new ConsommationCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new ConsommationCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case COOLANT_TEMPERATURE :
-										currentInfoPanel.setCommand(new EngineCoolantTemperatureCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new EngineCoolantTemperatureCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case THROTTLE_POSITION :
-										currentInfoPanel.setCommand(new ThrottlePositionCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new ThrottlePositionCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case HP :
-										currentInfoPanel.setCommand(new HPCommand(connection.getOutputStream(), connection.getInputStream()))
+										//currentInfoPanel.setCommand(new HPCommand(connection.getOutputStream(), connection.getInputStream()))
 										break;
 										//Should not exist in this form. Does not have a float type data /!\ Find something or kick it back to hell.
 										/*
@@ -148,13 +154,13 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 										break;
 										*/
 									case EVAPORATION_SYSTEM_PRESSURE :
-										currentInfoPanel.setCommand(new EvaporationSystemVaporPressureCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new EvaporationSystemVaporPressureCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case FUEL_RAIL_PRESSURE :
-										currentInfoPanel.setCommand(new FuelRailPressureCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new FuelRailPressureCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									case CONTROL_MODULE_VOLTAGE :
-										currentInfoPanel.setCommand(new ControlModuleVoltageCommand(connection.getOutputStream(), connection.getInputStream()));
+										//currentInfoPanel.setCommand(new ControlModuleVoltageCommand(connection.getOutputStream(), connection.getInputStream()));
 										break;
 									default :
 										currentInfoPanelIsDisplayed = false;
@@ -264,17 +270,19 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 	 * Fill the main window with a tabbed panel, containing 3 features for now.
 	 */
 	private void initiate(){
-		//connection = new ELM327Connection();		
+		connection = new ELM327Connection();	
+		informationsUpdate = new Thread(new UpdateInformations());
 
 		try {
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			Font terminalLikeFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/fr/obd2Reader/dialog/ShareTechMono_Regular.ttf"));
+			Font terminalLikeFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/res/fonts/ShareTechMono_Regular.ttf"));
 			ge.registerFont(terminalLikeFont);
 		} catch (FontFormatException | IOException e) {
 			e.printStackTrace();
 		}
 		
 		add(getCenterPanel(), BorderLayout.CENTER);
+		informationsUpdate.start();
 	}
 	
 	/**
@@ -302,18 +310,11 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 	private JPanel getRTIPanel(){
 		RTIPanel = new JPanel(new BorderLayout());
 		
+		VehicleCompatibility vehicleCompatibility = new VehicleCompatibility(connection.getOutputStream(), connection.getInputStream());
 		String[] informations = {	
 				"Pre-made panel", 
-				"Speed", 
-				"RPM", 
-				"Consomation", 
-				"Coolant temperature", 
-				"Throttle position", 
-				"HP", 
-				"Fuel system status",
-				"Evaporation system pressure",
-				"Fuel rail pressure",
-				"Control module voltage"};
+				"Speed"};
+		//String[] informations = vehicleCompatibility.availableCommands(); 
 		JList<String> infoList = new JList<String>(informations);
 		infoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		infoList.setBackground(Color.DARK_GRAY);
@@ -351,8 +352,8 @@ public class MainWindow extends JFrame implements RTIPanelConstants, TerminalCon
 	 */
 	private JPanel getTerminalPanel(){		
 		JPanel terminal = new JPanel(new BorderLayout());
-		//TerminalController terminalController = new TerminalController(connection);
-		TerminalController terminalController = new TerminalController();
+		TerminalController terminalController = new TerminalController(connection);
+		//TerminalController terminalController = new TerminalController();
 
 		
 		terminalOutput = new JTextField();

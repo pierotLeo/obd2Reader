@@ -3,7 +3,7 @@ package fr.obd2Reader.command;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class FuelSystemStatusCommand extends ObdCommand{
+public class FuelSystemStatusCommand extends CompatibilityTestableCommand{
 
 	private String[] status;
 	
