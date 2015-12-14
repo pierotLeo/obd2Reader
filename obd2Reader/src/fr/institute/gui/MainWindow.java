@@ -342,7 +342,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		buildDisconnectedRTIPanel();
 		buildConnectedRTIPanel();
 		
-		tabbedPanelChoice.addTab("Real time informations", disconnectedRTIPanel);
+		tabbedPanelChoice.addTab("Real time informations", connectedRTIPanel);
 		tabbedPanelChoice.addTab("Vehicle error codes", getErrorCodesPanel());
 		tabbedPanelChoice.addTab("Terminal", getTerminalPanel());
 		
@@ -365,7 +365,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	public void buildConnectedRTIPanel(){
 		connectedRTIPanel = new JPanel(new BorderLayout());
 		
-		String[] informations = {" a a a a a a "};
+		String[] informations = {"             "};
 		informationsList = new JList<String>(informations);
 		informationsList.setCellRenderer(new InfoCellRenderer());
 		
@@ -373,7 +373,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 		JScrollPane infoScroll = new JScrollPane(informationsList);		
 		
-		currentInfoPanel = new InformationPanel();
+		currentInfoPanel = new InformationPanel("néant");
 		
 		connectedRTIPanel.add(currentInfoPanel);
 		connectedRTIPanel.add(infoScroll, BorderLayout.WEST);
