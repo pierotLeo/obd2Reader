@@ -9,12 +9,20 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -37,18 +45,51 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JTabbedPane tabbedPanelChoice;
 	private JLabel disconnectedLabel;
 	private JList<String> informationsList;
+	private ArrayList<String> displayedInformations;
+	private ArrayList<Boolean> recordedInformations;
 	private JPanel connectedRTIPanel;
 	private JPanel disconnectedRTIPanel;
 	private JTextField terminalOutput;
 	private JTextArea terminalInput;
 	private InformationPanel currentInfoPanel;
 	private RequestEngineModel requestEngine;
-	private RequestView requestView;
 
 	private class UpdateInformations implements Runnable {
+		
 		@Override
-		public void run() {
+		public synchronized void run() {
+			String name;
+			float data;
+			Date date;
 			
+			Calendar prout = new GregorianCalendar();
+			prout.set(Calendar.DAY_OF_MONTH, prout.get(Calendar.DAY_OF_MONTH)-3);
+			Calendar prout2 = new GregorianCalendar();
+			prout2.set(Calendar.DAY_OF_MONTH, prout2.get(Calendar.DAY_OF_MONTH)-1);
+			
+			while(true){
+				
+				//FileHandler.saveData("vitesse", 12.0f, new Date(System.currentTimeMillis()));
+				System.out.println(FileHandler.meanData("vitesse", prout.getTime(), prout2.getTime()));
+				
+				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes)") && connect.getText().matches("disconnect")){
+					for(int i=0; i<displayedInformations.size(); i++){
+						if(recordedInformations.get(i)){
+							//on ouvre un fichier et on y écrit :
+							name =displayedInformations.get(i);
+							data = requestEngine.getUpToDateData(displayedInformations.get(i));
+							date = new Date(System.currentTimeMillis());
+						}
+					}
+					currentInfoPanel.updateGraphicPanel();
+					currentInfoPanel.updateNumericPanel();					
+				}										
+				try {
+					wait(10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
@@ -99,24 +140,31 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		}
 
 		@Override
-		public void menuSelected(MenuEvent arg0) {
-			System.out.println(arg0.toString());
-			
+		public void menuSelected(MenuEvent arg0) {			
 			String text = arg0.toString().substring(arg0.toString().indexOf("text=") + 5, arg0.toString().indexOf("]]"));
 			
 			switch(text){
 				case MENU_CONNECT : 
+					//rather than this, find an animation to put somewhere in the GUI so that the user now something is processing. 
 					JOptionPane.showMessageDialog(null, "Trying to connect to your car...", "Connecting", JOptionPane.INFORMATION_MESSAGE);
-					//disconnectedLabel.setText("Trying to connect to your car...");
 					if(connection.connect()){
 						file.setEnabled(true);
 						requestEngine = new RequestManager(connection.getOutputStream(), connection.getInputStream());
-						informationsList.setListData(requestEngine.getCompatibleRequests());
-						connect.setName(MENU_DISCONNECT);						
+						
+						String[] dataArray = requestEngine.getCompatibleRequests();
+						displayedInformations = new ArrayList<String>();
+						recordedInformations = new ArrayList<Boolean>();
+						displayedInformations.addAll(Arrays.asList(dataArray));
+						for(int i=0; i<displayedInformations.size(); i++){
+							recordedInformations.add(false);
+						}
+						informationsList.setListData(dataArray);
+						
+						connect.setName(MENU_DISCONNECT);
+						tabbedPanelChoice.setComponentAt(0, connectedRTIPanel);
 					}
 					else{
 						JOptionPane.showMessageDialog(null, "Connection failed :(", "Interrupted", JOptionPane.ERROR_MESSAGE);
-						disconnectedLabel.setText("Not connected to any device!");
 					}
 					break;
 				case MENU_DISCONNECT :
@@ -126,7 +174,6 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 					break;
 			}			
 		}
-		
 	}
 
 	private class InformationsListListener implements ListSelectionListener{
@@ -151,10 +198,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		@Override
 		public void keyPressed(KeyEvent arg0) {
 			if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
-				terminalInput.append(terminalOutput.getText());
-				connection.send(terminalOutput.getText());
+				terminalInput.append(terminalOutput.getText().substring(1));
+				connection.send(terminalOutput.getText().substring(1));
 				terminalInput.append(connection.read() + "\n");
-				terminalOutput.setText("");
+				terminalOutput.setText(">");
 			}
 		}
 
@@ -178,6 +225,9 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		customLookAndFeel();
 		initiateComponents();
 		initiateAspect();
+		
+		Thread updateInformation = new Thread(new UpdateInformations());
+		updateInformation.start();
 		
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -342,10 +392,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		buildDisconnectedRTIPanel();
 		buildConnectedRTIPanel();
 		
-		tabbedPanelChoice.addTab("Real time informations", connectedRTIPanel);
+		tabbedPanelChoice.addTab("Real time informations", disconnectedRTIPanel);
 		tabbedPanelChoice.addTab("Vehicle error codes", getErrorCodesPanel());
 		tabbedPanelChoice.addTab("Terminal", getTerminalPanel());
-		
+				
 		return tabbedPanelChoice;
 	}
 	
@@ -357,15 +407,16 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		disconnectedLabel.setForeground(Color.GREEN);
 		disconnectedLabel.setHorizontalAlignment(JLabel.CENTER);
 			
-		//disconnected.add(empty1, BorderLayout.WEST);
+		//disconnected.add(empty1, BorderLayout.WEST); put a sugoi animation here. 
 		disconnectedRTIPanel.add(disconnectedLabel, BorderLayout.CENTER);
+		disconnectedRTIPanel.setName(REAL_TIME_INFORMATIONS_PANEL);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void buildConnectedRTIPanel(){
 		connectedRTIPanel = new JPanel(new BorderLayout());
 		
-		String[] informations = {"             "};
+		String[] informations = {"              "};
 		informationsList = new JList<String>(informations);
 		informationsList.setCellRenderer(new InfoCellRenderer());
 		
@@ -377,12 +428,14 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 		connectedRTIPanel.add(currentInfoPanel);
 		connectedRTIPanel.add(infoScroll, BorderLayout.WEST);
+		connectedRTIPanel.setName(REAL_TIME_INFORMATIONS_PANEL);
 	}
 	
 	public JPanel getErrorCodesPanel(){
 		JPanel errorCodesPanel = new JPanel();
 		
 		
+		errorCodesPanel.setName(ERROR_CODE_PANEL);
 		
 		return errorCodesPanel;
 	}
@@ -390,7 +443,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	public JPanel getTerminalPanel(){
 		JPanel terminal = new JPanel(new BorderLayout());
 		
-		terminalOutput = new JTextField();
+		terminalOutput = new JTextField(">");
 		terminalOutput.addKeyListener(new TerminalOutputKeyListener());
 		
 		terminalInput = new JTextArea();
@@ -399,9 +452,12 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		terminal.add(terminalOutput, BorderLayout.SOUTH);
 		terminal.add(terminalInputScroller);
 		
+		terminal.setName("Terminal");
+		
 		return terminal;
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args){
 		MainWindow main = new MainWindow();
 	}

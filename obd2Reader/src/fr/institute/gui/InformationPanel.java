@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
+import java.util.Random;
 
 import javax.swing.*;
 
@@ -35,10 +36,12 @@ public class InformationPanel extends JTabbedPane{
 	private ValueAxis rangeAxis;
 	private XYSeries dataCurve;
 	private ChartPanel xylineChartPanel;
+	private long clock;
 	
 	public InformationPanel(String name){
 		super();
 		this.name = name;
+		this.clock = System.currentTimeMillis();
 		initiate();
 	}
 	
@@ -89,16 +92,17 @@ public class InformationPanel extends JTabbedPane{
 		 rangeAxis.setTickLabelFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
 		 rangeAxis.setLabelPaint(Color.GREEN);
 		 rangeAxis.setLabelFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
-		 rangeAxis.setRange(new Range(0,150));
+		 rangeAxis.setRange(new Range(0,100));
 		
 		 plot.setRangeGridlinePaint(Color.GREEN);
 		 
+		
 		 xylineChartPanel = new ChartPanel(xylineChart);
 		 
-	     XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer( );
+	     XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
 	     renderer.setSeriesPaint( 0 , Color.GREEN );
 	     renderer.setSeriesStroke( 0 , new BasicStroke( 4.0f ) );
-	     plot.setRenderer(renderer);
+	     renderer.setSeriesShapesVisible(0, false);
 	     
 	     return xylineChartPanel;
 	}
@@ -122,14 +126,15 @@ public class InformationPanel extends JTabbedPane{
 	private JPanel drawNumericPanel(){
 		JPanel numericPanel = new JPanel(new BorderLayout());
 		
-		DataTextArea = new JTextArea();
 		
-		numericPanel.add(DataTextArea, BorderLayout.CENTER);
+		
 		
 		return numericPanel;
 	}
 	
-	public void updateGraphicPanel(double chrono){
+	public void updateGraphicPanel(){
+		
+		double chrono = (float)((System.currentTimeMillis() - clock)/10)/100;
 		
 		if(!rangeAxis.isAutoRange() && !domainAxis.isAutoRange()){
 			rangeAxis.setAutoRange(true);
@@ -152,6 +157,10 @@ public class InformationPanel extends JTabbedPane{
 	
 	public void setName(String name){
 		this.name = name;
+	}
+	
+	public long getClock(){
+		return this.clock;
 	}
 
 }

@@ -21,5 +21,7 @@ public interface MainWindowConstants {
 							   MENU_FILE_RECORD = "record...",
 							   MENU_OPTION_LANGUAGE = "language",
 							   GLOBAL_FONT_FILE_PATH = "src/fr/institute/gui/ShareTechMono_Regular.ttf",
-							   GLOBAL_FONT_NAME = "Share Tech Mono";
+							   GLOBAL_FONT_NAME = "Share Tech Mono",
+							   REAL_TIME_INFORMATIONS_PANEL = "Real time informations",
+							   ERROR_CODE_PANEL = "Vehicle error codes";
 	}
