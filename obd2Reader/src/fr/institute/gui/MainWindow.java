@@ -62,23 +62,15 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			float data;
 			Date date;
 			
-			Calendar prout = new GregorianCalendar();
-			prout.set(Calendar.DAY_OF_MONTH, prout.get(Calendar.DAY_OF_MONTH)-3);
-			Calendar prout2 = new GregorianCalendar();
-			prout2.set(Calendar.DAY_OF_MONTH, prout2.get(Calendar.DAY_OF_MONTH)-1);
-			
 			while(true){
-				
-				//FileHandler.saveData("vitesse", 12.0f, new Date(System.currentTimeMillis()));
-				System.out.println(FileHandler.meanData("vitesse", prout.getTime(), prout2.getTime()));
 				
 				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes)") && connect.getText().matches("disconnect")){
 					for(int i=0; i<displayedInformations.size(); i++){
 						if(recordedInformations.get(i)){
-							//on ouvre un fichier et on y écrit :
 							name =displayedInformations.get(i);
 							data = requestEngine.getUpToDateData(displayedInformations.get(i));
 							date = new Date(System.currentTimeMillis());
+							FileHandler.saveData(name, data, date);
 						}
 					}
 					currentInfoPanel.updateGraphicPanel();
