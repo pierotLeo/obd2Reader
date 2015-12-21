@@ -9,8 +9,14 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,6 +49,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JMenu connect;
 	private JMenu file;
 	private JTabbedPane tabbedPanelChoice;
+	private JTabbedPane tabbedPanelRecord;
 	private JLabel disconnectedLabel;
 	private JList<String> informationsList;
 	private ArrayList<String> displayedInformations;
@@ -51,6 +58,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JPanel disconnectedRTIPanel;
 	private JTextField terminalOutput;
 	private JTextArea terminalInput;
+	private RecordPanel recordPanel;
 	private InformationPanel currentInfoPanel;
 	private RequestEngineModel requestEngine;
 
@@ -67,7 +75,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes)") && connect.getText().matches("disconnect")){
 					for(int i=0; i<displayedInformations.size(); i++){
 						if(recordedInformations.get(i)){
-							name =displayedInformations.get(i);
+							name = displayedInformations.get(i);
 							data = requestEngine.getUpToDateData(displayedInformations.get(i));
 							date = new Date(System.currentTimeMillis());
 							FileHandler.saveData(name, data, date);
@@ -118,6 +126,15 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 	}
 	
+	private class RecordFrameActionListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e){
+			recordPanel = new RecordPanel(displayedInformations, recordedInformations);			
+		}
+		
+	}
+	
 	private class GlobalMenuListener implements MenuListener{
 
 		@Override
@@ -137,7 +154,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			
 			switch(text){
 				case MENU_CONNECT : 
-					//rather than this, find an animation to put somewhere in the GUI so that the user now something is processing. 
+					//rather than this, find an animation to put somewhere in the GUI so that the user k	now something is processing. 
 					JOptionPane.showMessageDialog(null, "Trying to connect to your car...", "Connecting", JOptionPane.INFORMATION_MESSAGE);
 					if(connection.connect()){
 						file.setEnabled(true);
@@ -361,10 +378,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		file = new JMenu(MENU_FILE);
 		connect = new JMenu(MENU_CONNECT);
 		JMenu options = new JMenu(MENU_OPTIONS);
-		file.setEnabled(false);
 		connect.addMenuListener(new GlobalMenuListener());
 		
 		JMenuItem save = new JMenuItem(MENU_FILE_RECORD);
+		save.addActionListener(new RecordFrameActionListener());
 		JMenuItem language = new JMenuItem(MENU_OPTION_LANGUAGE);
 		
 		file.add(save);
@@ -416,7 +433,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 		JScrollPane infoScroll = new JScrollPane(informationsList);		
 		
-		currentInfoPanel = new InformationPanel("néant");
+		currentInfoPanel = new InformationPanel("nï¿½ant");
 		
 		connectedRTIPanel.add(currentInfoPanel);
 		connectedRTIPanel.add(infoScroll, BorderLayout.WEST);
