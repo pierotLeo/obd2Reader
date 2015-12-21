@@ -45,7 +45,7 @@ public class RecordPanel extends JFrame implements MainWindowConstants{
 			for(int i=0; i<recordedInformations.size(); i++)
 				recordPanel.add(recordedInformations.get(i), BorderLayout.NORTH);
 			for(int i=0; i< nonRecordedInformations.size();i++)
-				recordPanel.add(nonRecordedInformations.get(i), BorderLayout.CENTER);
+				recordPanel.add(nonRecordedInformations.get(i), BorderLayout.SOUTH);
 		}
 		this.setContentPane(recordPanel);
 		this.setVisible(true);
@@ -78,7 +78,7 @@ public class RecordPanel extends JFrame implements MainWindowConstants{
 				for(int i=0; i<recordedInformations.size(); i++)
 					recordPanel.add(recordedInformations.get(i), BorderLayout.NORTH);
 				for(int i=0; i< nonRecordedInformations.size();i++)
-					recordPanel.add(nonRecordedInformations.get(i), BorderLayout.CENTER);
+					recordPanel.add(nonRecordedInformations.get(i), BorderLayout.SOUTH);
 			}
 		}
 	}
@@ -106,7 +106,7 @@ public class RecordPanel extends JFrame implements MainWindowConstants{
 				for(int i=0; i<recordedInformations.size(); i++)
 					recordPanel.add(recordedInformations.get(i), BorderLayout.NORTH);
 				for(int i=0; i< nonRecordedInformations.size();i++)
-					recordPanel.add(nonRecordedInformations.get(i), BorderLayout.CENTER);
+					recordPanel.add(nonRecordedInformations.get(i), BorderLayout.SOUTH);
 			}
 		}
 	}	
