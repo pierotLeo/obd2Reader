@@ -5,9 +5,9 @@ public class PidCell {
 	private int pidId;
 	private String pidName;
 	private String pidUnit;
-	private Treatment treatment;
+	private RTITreatment treatment;
 	
-	public PidCell(int pidId, String pidName, String pidUnit, Treatment treatment){
+	public PidCell(int pidId, String pidName, String pidUnit, RTITreatment treatment){
 		this.pidId = pidId;
 		this.pidName = pidName;
 		this.pidUnit = pidUnit;
@@ -26,7 +26,7 @@ public class PidCell {
 		return pidUnit;
 	}
 	
-	public Treatment getTreatment(){
+	public RTITreatment getTreatment(){
 		return treatment;
 	}
 	
@@ -42,7 +42,7 @@ public class PidCell {
 		this.pidUnit = pidUnit;
 	}
 	
-	public void setTreatment(Treatment treatment){
+	public void setTreatment(RTITreatment treatment){
 		this.treatment = treatment;
 	}
 }

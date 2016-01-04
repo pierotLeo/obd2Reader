@@ -14,7 +14,7 @@ import java.util.GregorianCalendar;
 
 public class FileHandler {
 
-	public static double meanData(String dataName, Date from, Date until){
+	public static double avgData(String dataName, Date from, Date until){
 		Calendar start = new GregorianCalendar(), 
 					end = new GregorianCalendar(),
 					old = new GregorianCalendar(),
@@ -70,7 +70,7 @@ public class FileHandler {
 		return mean/nbData;	
 	}
 
-	public static double meanData(String dataName, Date date){
+	public static double avgData(String dataName, Date date){
 		Calendar start = new GregorianCalendar();
 		start.setTime(date);
 		
@@ -111,7 +111,7 @@ public class FileHandler {
 		
 	}
 	
-	public static double meanData(String dataName){
+	public static double avgData(String dataName){
 		Calendar calendar = Calendar.getInstance();
 		String saveFileName = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + " - " + 
 								String.valueOf(calendar.get(Calendar.MONTH)) + " - " + 

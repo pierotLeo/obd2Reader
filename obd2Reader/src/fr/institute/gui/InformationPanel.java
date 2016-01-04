@@ -14,27 +14,33 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.MeterInterval;
+import org.jfree.chart.plot.MeterPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.Range;
-import org.jfree.data.xy.XYDataItem;
+import org.jfree.data.general.DefaultValueDataset;
+import org.jfree.data.general.ValueDataset;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import fr.institute.engine.RequestEngineModel;
 
+@SuppressWarnings("serial")
 public class InformationPanel extends JTabbedPane{
 
-	public static final int MAX_TIME_RANGE = 60;
+	public static final int MAX_TIME_RANGE = 10;
+	public static final int DISPLAY_OFFSET = 1;
+	
 	private String name;
 	private RequestView requestView;
-	private RequestEngineModel requestEngine;
-	private JTextArea DataTextArea;
+	private RequestEngineModel requestEngine; 
 	private ValueAxis domainAxis;
 	private ValueAxis rangeAxis;
 	private XYSeries dataCurve;
+	private DefaultValueDataset dataSet;
 	private ChartPanel xylineChartPanel;
 	private long clock;
 	
@@ -118,23 +124,41 @@ public class InformationPanel extends JTabbedPane{
       	return dataset;
 	}
 	
-	
-	/**
-	 * Build numeric representation of the information.
-	 * @return
-	 */
-	private JPanel drawNumericPanel(){
-		JPanel numericPanel = new JPanel(new BorderLayout());
-		
-		
-		
-		
-		return numericPanel;
-	}
+   
+    /**
+     * Creates a sample chart.
+     *
+     * @param dataset  a dataset.
+     *
+     * @return The chart.
+     */
+    private JFreeChart createChart(ValueDataset dataset) {
+        MeterPlot plot = new MeterPlot(dataset);
+        plot.addInterval(new MeterInterval("High", new Range(80.0, 100.0)));
+        plot.setDialOutlinePaint(Color.white);
+        JFreeChart chart = new JFreeChart(name + "\n" + "requestView.getUnit(name)",
+                JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+        return chart;
+    }
+    
+    private JPanel drawNumericPanel() {
+        dataSet = new DefaultValueDataset(0.0);
+        JFreeChart chart = createChart(dataSet);
+        JPanel panel = new JPanel(new BorderLayout());
+        
+        panel.add(new ChartPanel(chart));
+        return panel;
+    }
 	
 	public void updateGraphicPanel(){
+		String unit = "";
+		if(requestView != null)
+			unit = requestView.getUnit(name);
 		
 		double chrono = (float)((System.currentTimeMillis() - clock)/10)/100;
+		
+		if(!unit.equals(domainAxis.getLabel()))
+			domainAxis.setLabel(unit);
 		
 		if(!rangeAxis.isAutoRange() && !domainAxis.isAutoRange()){
 			rangeAxis.setAutoRange(true);
@@ -142,18 +166,44 @@ public class InformationPanel extends JTabbedPane{
 		}
 		
 		dataCurve.add(chrono, requestEngine.getUpToDateData(name));
-		if(dataCurve.getItemCount() > MAX_TIME_RANGE){
-			domainAxis.setLowerBound(dataCurve.getItemCount() - MAX_TIME_RANGE);
+		if(chrono > MAX_TIME_RANGE){
+			domainAxis.setLowerBound(chrono - MAX_TIME_RANGE);
+			domainAxis.setUpperBound(chrono + DISPLAY_OFFSET);
 		}
 	}
 
 	/**
-	 * Add a new data to the numeric representation's set of datas and update it.
+	 * Add a new data to the numeric representation's set of data and update it.
 	 * @param newData : data to update representation with.
 	 */
 	public void updateNumericPanel(){
-		
+		dataSet.setValue(requestEngine.getUpToDateData(name));
 	}	
+	
+	public void randomUpdateGraphicPanel(int timeRatio){
+		String unit = "";
+		if(requestView != null)
+			unit = requestView.getUnit(name);
+		
+		double chrono = (float)((System.currentTimeMillis() - clock)/10)/100;
+		
+		
+		if(!unit.equals(domainAxis.getLabel()))
+			domainAxis.setLabel(unit);
+		
+		if(!rangeAxis.isAutoRange() && !domainAxis.isAutoRange()){
+			rangeAxis.setAutoRange(true);
+			domainAxis.setAutoRange(true);
+		}
+		
+		Random rand = new Random();
+		
+		dataCurve.add(chrono, rand.nextInt()%100);
+		if(chrono >= MAX_TIME_RANGE){
+			domainAxis.setLowerBound(chrono - MAX_TIME_RANGE);
+			domainAxis.setUpperBound(chrono + DISPLAY_OFFSET);
+		}
+	}
 	
 	public void setName(String name){
 		this.name = name;

@@ -1,5 +1,6 @@
 package fr.institute.engine;
 
+import fr.institute.connection.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,12 +12,20 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	
 	private InputStream input;
 	private OutputStream output;
+	private Connection connection;
 	private ArrayList<PidRequest> requestTable;
 	private ArrayList<Integer> vehicleRef;
 	
 	//only for tests
 	public RequestManager(){
-		
+		requestTable = new ArrayList<PidRequest>();
+	}
+	
+	public RequestManager(Connection connection){
+		this.connection = connection;
+		this.input = connection.getInputStream();
+		requestTable = new ArrayList<PidRequest>();
+		vehicleRef = getVehicleRef();
 	}
 	
 	public RequestManager(OutputStream output, InputStream input){
@@ -54,11 +63,13 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 		ArrayList<Integer> vehicleRef = new ArrayList<Integer>();
 		String request;
 		
-		for(int i=0; i<4; i++){
-			request = "01" + 2*i + "0";
+		
+		for(int i=1; i<=4; i++){
+			request = "Vehicle compatibility - " + i ;
+			System.out.println(request);
 			sendRequest(request);
 			readRequest(request);
-			vehicleRef.addAll(requestTable.get(indexOf(Integer.parseInt(request,16))).getBuffer());
+			vehicleRef.addAll(requestTable.get(indexOf(requestRoutageTable.getNumberAt(request))).getBuffer());
 		}
 		
 		return vehicleRef;
@@ -83,25 +94,32 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 			String fullByteString = "";
 			char currentReadChar = ' ';
 			int indexOfAnswer = 0;
-			while(!Character.toString(currentReadChar).equals("4")){
+			
+			while(currentReadChar != '4' && currentReadChar != '>'){
 				currentReadChar = (char) input.read();
+				System.out.print(currentReadChar);
 			}
 			
-			for(int i=0; i<5; i++){
-				currentReadChar = (char) input.read();
-			}
-
-			while(!Character.toString(currentReadChar).equals(">")){
-				
-				if(Character.toString(currentReadChar).matches("^[a-fA-F0-9]$")){
-					indexOfAnswer++;
-					fullByteString += Character.toString(currentReadChar);
-					if(indexOfAnswer%2 == 0){
-						requestTable.get(indexOf(pidName)).getBuffer().add(Integer.parseInt(fullByteString, 16));
-						fullByteString = "";
-					}
+			if(currentReadChar != '>'){
+				for(int i=0; i<5; i++){
+					currentReadChar = (char) input.read();
 				}
-				currentReadChar = (char) input.read();
+				
+				while(currentReadChar != '>'){
+					if(Character.toString(currentReadChar).matches("^[a-fA-F0-9]$")){
+						indexOfAnswer++;
+						fullByteString += Character.toString(currentReadChar);
+						if(indexOfAnswer%2 == 0){
+							/*System.out.println("requestTable : " + requestTable);
+							System.out.println("index : " + requestTable.get(indexOf(pidName)));
+							System.out.println("Buffer : " + requestTable.get(indexOf(pidName)).getBuffer());*/
+							requestTable.get(indexOf(pidName)).getBuffer().add(Integer.parseInt(fullByteString, 16));
+							fullByteString = "";
+						}
+					}
+					currentReadChar = (char) input.read();
+				}
+				//System.out.println();				
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -119,16 +137,21 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	}
 		
 	public void sendRequest(String pidName){
+		String toSend = "";
+	
 		if(!requestAlreadyCreated(requestRoutageTable.getNumberAt(pidName))){
 			requestTable.add(new PidRequest(requestRoutageTable.getNumberAt(pidName)));
 		}
+		toSend = String.format("%04X", requestRoutageTable.getNumberAt(pidName)) + "\r";
 		
-		try {
-			output.write((String.format("%04X", requestRoutageTable.getNumberAt(pidName))+"\r").getBytes());
+		connection.send(toSend);
+		
+		/*try {
+			output.write(toSend.getBytes());
 			output.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	@Override
@@ -152,6 +175,13 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 		return requestRoutageTable.getTreatmentAt(pidName).compute(requestTable.get(indexOf(pidName)).getBuffer());
 	}
 
+	@Override
+	public ArrayList<String> getErrorCodes() {
+		sendRequest("Vehicle error codes");
+		readRequest("Vehicle error codes");
+		
+		return requestRoutageTable.getErrorCodesTreatment().compute(requestTable.get(indexOf("Vehicle error codes")).getBuffer());
+	}
 	
 	public InputStream getInput() {
 		return input;
@@ -186,5 +216,9 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	public void setVehicleRef(ArrayList<Integer> vehicleRef) {
 		this.vehicleRef = vehicleRef;
 	}
-	
+
+	public static void main(){
+		ArrayList<PidRequest> requestTable = new ArrayList<PidRequest>();
+		
+	}
 }

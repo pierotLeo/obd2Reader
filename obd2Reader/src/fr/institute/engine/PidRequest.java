@@ -9,6 +9,7 @@ public class PidRequest {
 
 	public PidRequest(int pidNumber){
 		this.pidId = pidNumber;
+		buffer = new ArrayList<Integer>();
 	}
 	
 	public ArrayList<Integer> getBuffer(){

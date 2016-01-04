@@ -21,7 +21,7 @@ public class ELM327Connection implements Connection{
 		btConnection.readUntil(">");
 		btConnection.send("ATSP0");
 		btConnection.readUntil(">");
-		
+				
 		return wasAbleToConnect;
 	}
 	
@@ -67,11 +67,14 @@ public class ELM327Connection implements Connection{
 	}
 	
 	public void send(String cmd){
-				btConnection.send(cmd);
+		System.out.println("sent : " + cmd);
+		btConnection.send(cmd);
 	}
 	
 	public String read(){
-		return(btConnection.readUntil(">"));
+		String read = btConnection.readUntil(">");
+		System.out.println("read : " + read);
+		return(read);
 	}
 	
 	public InputStream getInputStream(){
