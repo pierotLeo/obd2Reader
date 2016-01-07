@@ -1,12 +1,11 @@
 package fr.institute.engine;
 
 import fr.institute.connection.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class RequestManager implements RequestEngineModel, DirectAccessToRequestRoutageTable{
+public class RequestManager implements RequestEngineModel, DirectAccessToRequestRouteTable{
 
 	public static final int NOT_FOUND = -1;
 	
@@ -37,9 +36,10 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	
 	public int indexOf(String pidName){
 		int index = NOT_FOUND;
+		int pidId = requestRouteTable.getNumberAt(pidName);
 		
 		for(int i=0; i<requestTable.size(); i++){
-			if(requestTable.get(i).getPidId() == requestRoutageTable.getNumberAt(pidName)){
+			if(requestTable.get(i).getPidId() == pidId){
 				index = i;
 			}
 		}
@@ -62,16 +62,23 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	public ArrayList<Integer> getVehicleRef(){
 		ArrayList<Integer> vehicleRef = new ArrayList<Integer>();
 		String request;
-		
+		boolean ableToConnect = false;
 		
 		for(int i=1; i<=4; i++){
-			request = "Vehicle compatibility - " + i ;
+			request = "Vehicle compatibility - " + i;
 			System.out.println(request);
+			
 			sendRequest(request);
-			readRequest(request);
-			vehicleRef.addAll(requestTable.get(indexOf(requestRoutageTable.getNumberAt(request))).getBuffer());
+			ableToConnect = readRequest(request);
+			while(!ableToConnect){
+				sendRequest(request);
+				ableToConnect = readRequest(request);
+			};
+			
+			
+			vehicleRef.addAll(requestTable.get(indexOf(requestRouteTable.getNumberAt(request))).getBuffer());
 		}
-		
+
 		return vehicleRef;
 	}
 	
@@ -89,41 +96,64 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 		return compatible;
 	}
 	
-	public void readRequest(String pidName){
+	public boolean readRequest(String pidName){
 		try{
+			System.out.println("name : " + pidName);
 			String fullByteString = "";
+			String skippedChars = "";
+			ArrayList<Integer> fullBuffer = new ArrayList<Integer>();
 			char currentReadChar = ' ';
 			int indexOfAnswer = 0;
 			
-			while(currentReadChar != '4' && currentReadChar != '>'){
+			System.out.print("Skiping : ");
+			for(int i=0; i<4; i++){
 				currentReadChar = (char) input.read();
 				System.out.print(currentReadChar);
 			}
 			
+			while(currentReadChar != '4' && currentReadChar != '>'){
+				currentReadChar = (char) input.read();
+				skippedChars += currentReadChar;
+				System.out.print(currentReadChar);
+			}
+			
+			if(skippedChars.contains("UNABLE TO CONNECT")){
+				return false;
+			}
+			
+			System.out.println("\ncurrentReadChar : " + currentReadChar);
 			if(currentReadChar != '>'){
 				for(int i=0; i<5; i++){
 					currentReadChar = (char) input.read();
 				}
-				
+				System.out.println("current char : " + currentReadChar);
 				while(currentReadChar != '>'){
 					if(Character.toString(currentReadChar).matches("^[a-fA-F0-9]$")){
 						indexOfAnswer++;
 						fullByteString += Character.toString(currentReadChar);
 						if(indexOfAnswer%2 == 0){
+							System.out.println("full byte : " + fullByteString);
 							/*System.out.println("requestTable : " + requestTable);
 							System.out.println("index : " + requestTable.get(indexOf(pidName)));
 							System.out.println("Buffer : " + requestTable.get(indexOf(pidName)).getBuffer());*/
-							requestTable.get(indexOf(pidName)).getBuffer().add(Integer.parseInt(fullByteString, 16));
+							fullBuffer.add(Integer.parseInt(fullByteString, 16));
+							//requestTable.get(indexOf(pidName)).addToBuffer(Integer.parseInt(fullByteString, 16));
+							System.out.print("current byte : ");
+							for(int currentByte : requestTable.get(indexOf(pidName)).getBuffer())
+								System.out.print(currentByte);	
+							System.out.println();
 							fullByteString = "";
 						}
 					}
-					currentReadChar = (char) input.read();
+					requestTable.get(indexOf(pidName)).setBuffer(fullBuffer);
+						
+					currentReadChar = (char) input.read(); //???????
 				}
-				//System.out.println();				
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		return true;
 	}
 
 	public boolean requestAlreadyCreated(int pidNumber){
@@ -139,10 +169,10 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	public void sendRequest(String pidName){
 		String toSend = "";
 	
-		if(!requestAlreadyCreated(requestRoutageTable.getNumberAt(pidName))){
-			requestTable.add(new PidRequest(requestRoutageTable.getNumberAt(pidName)));
+		if(!requestAlreadyCreated(requestRouteTable.getNumberAt(pidName))){
+			requestTable.add(new PidRequest(requestRouteTable.getNumberAt(pidName)));
 		}
-		toSend = String.format("%04X", requestRoutageTable.getNumberAt(pidName)) + "\r";
+		toSend = String.format("%04X", requestRouteTable.getNumberAt(pidName)) + "\r";
 		
 		connection.send(toSend);
 		
@@ -158,9 +188,9 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	public String[] getCompatibleRequests() {
 		ArrayList<String> availableCommandsList = new ArrayList<String>();
 		
-		for(int i = 0; i < requestRoutageTable.size(); i++){
-			if(isCompatible(requestRoutageTable.get(i).getPidId()))
-					availableCommandsList.add(requestRoutageTable.get(i).getPidName());
+		for(int i = 0; i < requestRouteTable.size(); i++){
+			if(isCompatible(requestRouteTable.get(i).getPidId()))
+					availableCommandsList.add(requestRouteTable.get(i).getPidName());
 		}
 		
 		String[] availableCommands = availableCommandsList.toArray(new String[availableCommandsList.size()]);
@@ -172,15 +202,21 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	public float getUpToDateData(String pidName) {
 		sendRequest(pidName);
 		readRequest(pidName);
-		return requestRoutageTable.getTreatmentAt(pidName).compute(requestTable.get(indexOf(pidName)).getBuffer());
+
+		return requestRouteTable.getTreatmentAt(pidName).compute(requestTable.get(indexOf(pidName)).getBuffer());
 	}
 
+	@Override
+	public String getUnit(String pidName){
+		return requestRouteTable.getUnitAt(pidName);
+	}
+	
 	@Override
 	public ArrayList<String> getErrorCodes() {
 		sendRequest("Vehicle error codes");
 		readRequest("Vehicle error codes");
 		
-		return requestRoutageTable.getErrorCodesTreatment().compute(requestTable.get(indexOf("Vehicle error codes")).getBuffer());
+		return requestRouteTable.getErrorCodesTreatment().compute(requestTable.get(indexOf("Vehicle error codes")).getBuffer());
 	}
 	
 	public InputStream getInput() {
@@ -217,8 +253,4 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 		this.vehicleRef = vehicleRef;
 	}
 
-	public static void main(){
-		ArrayList<PidRequest> requestTable = new ArrayList<PidRequest>();
-		
-	}
 }

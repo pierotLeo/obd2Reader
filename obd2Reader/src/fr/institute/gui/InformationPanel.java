@@ -35,18 +35,20 @@ public class InformationPanel extends JTabbedPane{
 	public static final int DISPLAY_OFFSET = 1;
 	
 	private String name;
-	private RequestView requestView;
+	//private RequestView requestView;
 	private RequestEngineModel requestEngine; 
 	private ValueAxis domainAxis;
 	private ValueAxis rangeAxis;
 	private XYSeries dataCurve;
+	private JFreeChart chart;
 	private DefaultValueDataset dataSet;
 	private ChartPanel xylineChartPanel;
 	private long clock;
 	
-	public InformationPanel(String name){
+	public InformationPanel(String name, RequestEngineModel requestEngine){
 		super();
 		this.name = name;
+		this.requestEngine = requestEngine;
 		this.clock = System.currentTimeMillis();
 		initiate();
 	}
@@ -57,6 +59,7 @@ public class InformationPanel extends JTabbedPane{
 	 * @throws FontFormatException  
 	 */
 	private void initiate(){
+		this.removeAll();	
 		this.addTab("Graphic", drawGraphicPanel());
 		this.addTab("Numeric", drawNumericPanel());
 		this.setOpaque(true);
@@ -67,10 +70,15 @@ public class InformationPanel extends JTabbedPane{
 	
 	private ChartPanel drawGraphicPanel(){
 		
+		String unit = "";
+		
+		if(requestEngine != null)
+			unit = requestEngine.getUnit(name);
+		
 		 JFreeChart xylineChart = ChartFactory.createXYLineChart(
 		         "Graphic representation" ,
 		         "Time" ,
-		         "requestView.getUnit(name)" ,
+		         unit ,
 		         createDataset() ,
 		         PlotOrientation.VERTICAL ,
 		         true , true , false);
@@ -80,7 +88,7 @@ public class InformationPanel extends JTabbedPane{
 		 xylineChart.getLegend().setBackgroundPaint(Color.DARK_GRAY);
 		 xylineChart.getLegend().setItemPaint(Color.GREEN);
 		 xylineChart.getLegend().setItemFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
-		 
+		
 		 final XYPlot plot = xylineChart.getXYPlot( );
 		 plot.setBackgroundPaint(Color.GRAY);
 		 
@@ -90,7 +98,7 @@ public class InformationPanel extends JTabbedPane{
 		 domainAxis.setLabelPaint(Color.GREEN);
 		 domainAxis.setLabelFont(new Font("Share Tech Mono", Font.TRUETYPE_FONT, 15));
 		 domainAxis.setRange(new Range(0,MAX_TIME_RANGE));
-
+		 
 		 plot.setDomainGridlinePaint(Color.GREEN);
 		 
 		 rangeAxis = plot.getRangeAxis();
@@ -136,8 +144,15 @@ public class InformationPanel extends JTabbedPane{
         MeterPlot plot = new MeterPlot(dataset);
         plot.addInterval(new MeterInterval("High", new Range(80.0, 100.0)));
         plot.setDialOutlinePaint(Color.white);
-        JFreeChart chart = new JFreeChart(name + "\n" + "requestView.getUnit(name)",
+        
+        String unit = "";
+        if(requestEngine != null)
+			unit = requestEngine.getUnit(name);
+		
+        
+        chart = new JFreeChart(name + "\n" + unit,
                 JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+       
         return chart;
     }
     
@@ -152,13 +167,13 @@ public class InformationPanel extends JTabbedPane{
 	
 	public void updateGraphicPanel(){
 		String unit = "";
-		if(requestView != null)
-			unit = requestView.getUnit(name);
+		if(requestEngine != null)
+			unit = requestEngine.getUnit(name);
 		
 		double chrono = (float)((System.currentTimeMillis() - clock)/10)/100;
 		
-		if(!unit.equals(domainAxis.getLabel()))
-			domainAxis.setLabel(unit);
+		if(!unit.equals(rangeAxis.getLabel()))
+			rangeAxis.setLabel(unit);
 		
 		if(!rangeAxis.isAutoRange() && !domainAxis.isAutoRange()){
 			rangeAxis.setAutoRange(true);
@@ -180,16 +195,16 @@ public class InformationPanel extends JTabbedPane{
 		dataSet.setValue(requestEngine.getUpToDateData(name));
 	}	
 	
-	public void randomUpdateGraphicPanel(int timeRatio){
+	public void randomUpdateGraphicPanel(){
 		String unit = "";
-		if(requestView != null)
-			unit = requestView.getUnit(name);
+		if(requestEngine != null)
+			unit = requestEngine.getUnit(name);
 		
 		double chrono = (float)((System.currentTimeMillis() - clock)/10)/100;
 		
 		
-		if(!unit.equals(domainAxis.getLabel()))
-			domainAxis.setLabel(unit);
+		if(!unit.equals(rangeAxis.getLabel()))
+			rangeAxis.setLabel(unit);
 		
 		if(!rangeAxis.isAutoRange() && !domainAxis.isAutoRange()){
 			rangeAxis.setAutoRange(true);
@@ -198,12 +213,49 @@ public class InformationPanel extends JTabbedPane{
 		
 		Random rand = new Random();
 		
-		dataCurve.add(chrono, rand.nextInt()%100);
+		dataCurve.add(chrono, Math.abs(rand.nextInt()%100));
 		if(chrono >= MAX_TIME_RANGE){
 			domainAxis.setLowerBound(chrono - MAX_TIME_RANGE);
 			domainAxis.setUpperBound(chrono + DISPLAY_OFFSET);
 		}
 	}
+	
+	public void specificUpdateGraphicPanel(int data){
+		String unit = "";
+		if(requestEngine != null)
+			unit = requestEngine.getUnit(name);
+		
+		double chrono = (float)((System.currentTimeMillis() - clock)/10)/100;
+		
+		
+		if(!unit.equals(rangeAxis.getLabel()))
+			rangeAxis.setLabel(unit);
+		
+		if(!rangeAxis.isAutoRange() && !domainAxis.isAutoRange()){
+			rangeAxis.setAutoRange(true);
+			domainAxis.setAutoRange(true);
+		}
+				
+		dataCurve.add(chrono, data);
+		if(chrono >= MAX_TIME_RANGE){
+			domainAxis.setLowerBound(chrono - MAX_TIME_RANGE);
+			domainAxis.setUpperBound(chrono + DISPLAY_OFFSET);
+		}
+	}
+	
+	public void changeInformationTo(String name){
+		setName(name);
+		/*dataCurve.clear();
+		domainAxis.setLabel(name);
+		chart.setTitle(name);*/
+		initiate();
+		clock = System.currentTimeMillis();
+	}
+
+	public String getName(){
+		return name;
+	}
+	
 	
 	public void setName(String name){
 		this.name = name;
@@ -213,4 +265,12 @@ public class InformationPanel extends JTabbedPane{
 		return this.clock;
 	}
 
+	public RequestEngineModel getRequestEngine(){
+		return requestEngine;
+	}
+	
+	public void setRequestEngine(RequestEngineModel requestEngine){
+		this.requestEngine = requestEngine;
+	}
+	
 }

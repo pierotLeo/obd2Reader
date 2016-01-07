@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface Connection {
+	
 	public boolean connect();
 	public void disconnect();
 	public void send(String message);

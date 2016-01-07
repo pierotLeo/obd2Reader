@@ -50,7 +50,7 @@ public class BluetoothConnection {
 	}
 	
 	/**
-     * Called by garbage collector. Close the streams and connection if a connection was made.
+     * Called by garbage collector. Close the streams and connection if a connection was made before.
 	 *
      */
 	@Override
@@ -267,7 +267,6 @@ public class BluetoothConnection {
 		return inBufStr;
 	}
 	
-	//déplacer vers ObdCommand
 	/**
      * Read one character from an input stream and cast the bytes received from int to ASCII.
 	 *

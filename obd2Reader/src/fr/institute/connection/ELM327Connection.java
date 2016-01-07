@@ -14,6 +14,11 @@ public class ELM327Connection implements Connection{
 		btConnection = new BluetoothConnection();	
 	}
 	
+	/**
+	 * Establish a bluetooth connection to the ELM327 module.
+	 * @return : true if the connection succeeded, else false. 
+	 */
+	@Override
 	public boolean connect(){
 		boolean wasAbleToConnect = connectToElm327(btConnection);
 		
@@ -25,6 +30,9 @@ public class ELM327Connection implements Connection{
 		return wasAbleToConnect;
 	}
 	
+	/**
+	 * Cut the connection to the module.
+	 */
 	public void disconnect(){
 		btConnection = null;
 	}
@@ -66,21 +74,37 @@ public class ELM327Connection implements Connection{
 		return url;
 	}
 	
+	/**
+	 * Send a string of character to the module.
+	 *
+	 * @param cmd : string to send.
+	 */
 	public void send(String cmd){
-		System.out.println("sent : " + cmd);
 		btConnection.send(cmd);
 	}
 	
+	/**
+	 * Read a line from the module answers.
+	 * 
+	 * @return : string that have been read.
+	 */
 	public String read(){
 		String read = btConnection.readUntil(">");
 		System.out.println("read : " + read);
 		return(read);
 	}
 	
+	/**
+	 * Getter for the connection's input stream.
+	 */
 	public InputStream getInputStream(){
 		return btConnection.getInputStream();
 	}
 	
+
+	/**
+	 * Getter for the connection's output stream.
+	 */
 	public OutputStream getOutputStream(){
 		return btConnection.getOutputStream();
 	}

@@ -60,41 +60,9 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JTextArea terminalInput;
 	private JPanel dashboard;
 	private JPanel disconnectedPanel;
+	private JScrollPane infoScroll;
 	
 	private InformationPanel currentInfoPanel;
-	
-	private class aScrollBar extends  JScrollBar{
-		public aScrollBar(){
-			super();
-			setUI(new CustomedScrollBarUI());
-		}
-	}
-	
-	private class CustomedScrollBarUI extends BasicScrollBarUI{
-		protected void paintTrack (Graphics g, JComponent c, Rectangle trackBounds){
-			
-		}
-		
-		protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds){
-			
-			BufferedImage thumbImg;
-			try {
-				thumbImg = ImageIO.read(new File("vault_boy_icon.png"));
-				
-				if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
-					return;
-				}
-				g.translate(thumbBounds.x, thumbBounds.y);
-				g.drawRect(0, 0, thumbBounds.width - 2, thumbBounds.height - 1);
-				AffineTransform transform = AffineTransform.getScaleInstance((double) thumbBounds.width
-						/ thumbImg.getWidth(null), (double) thumbBounds.height / thumbImg.getHeight(null));
-				((Graphics2D) g).drawImage(thumbImg, transform, null);
-				g.translate(-thumbBounds.x, -thumbBounds.y);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 	
 	private class RecordFrame extends JFrame{
 		
@@ -121,6 +89,9 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			setVisible(true);
 		}
 
+		/**
+		 * Default constructor for RecordFrame().
+		 */
 		public RecordFrame(){
 			super();
 			
@@ -135,6 +106,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			setVisible(true);
 		}
 		
+		/**
+		 * Build the main panel inside the frame.
+		 * @return
+		 */
 		public JPanel getMainPanel(){
 			JPanel mainPanel = new JPanel(new GridLayout(2,1));
 			
@@ -153,6 +128,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			return histogramPanel;
 		}
 		
+		/**
+		 * Build the panel containing a list of any non recorded information and a button to record them.
+		 * @return
+		 */
 		public JPanel getNonRecordedPanel(){
 			JPanel nonRecordedPanel = new JPanel(new BorderLayout());
 			JPanel buttonPanel = new JPanel(new GridLayout(1,3));
@@ -187,6 +166,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			return nonRecordedPanel;
 		}
 		
+		/**
+		 * Build the panel containing a list of any recorded information and a button to stop their record.
+		 * @return
+		 */
 		public JPanel getRecordedPanel(){
 			JPanel recordedPanel = new JPanel(new BorderLayout());
 			JPanel buttonPanel = new JPanel(new GridLayout(1,3));
@@ -222,6 +205,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			return recordedPanel;
 		}
 		
+		/**
+		 * Build a list of any information's name that is being recorded or not, depending on the parameter.
+		 * @param recorded : true if a list of recorded information is desired, else false.
+		 * @return
+		 */
 		private ArrayList<String> getInfoType(boolean recorded){
 			ArrayList<String> infoTypeList = new ArrayList<String>();
 			
@@ -235,6 +223,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			return infoTypeList;
 		}
 		
+		/**
+		 * Build a list of the checked JCheck boxes of one of the areas, depending on the parameter. 
+		 * @param recorded : true if you want to gather every recorded informations checked boxes, else false. 
+		 * @return
+		 */
 		public ArrayList<JCheckBox> selectedIndex(boolean recorded){
 			ArrayList<JCheckBox> selectedIndex = new ArrayList<JCheckBox>();
 			
@@ -256,6 +249,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			return selectedIndex;
 		}
 		
+		/**
+		 * Listener listening to start record and stop record buttons.
+		 * @author Supa Kanojo Hunta
+		 *
+		 */
 		private class RecordButtonListener implements ActionListener{
 
 			@Override
@@ -292,8 +290,12 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		}
 	}
 
+	/**
+	 * Class used to start the UpdateInformations Thread. Refresh the graphic display of the informations and save recorded informations.
+	 * @author Supa Kanojo Hunta
+	 *
+	 */
 	private class UpdateInformations implements Runnable {
-		public static final int SECOND = 1000;
 		
 		@Override
 		public synchronized void run() {
@@ -303,6 +305,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			int msDelay = 100;
 			
 			while(true){
+				try {
 				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes|Dashboard)") && connect.getText().matches("disconnect")){
 					for(int i=0; i<displayedInformations.size(); i++){
 						if(recordedInformations.get(i)){
@@ -312,12 +315,103 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 							FileHandler.saveData(name, data, date);
 						}
 					}
-					
-					currentInfoPanel.updateNumericPanel();					
+					if(requestEngine != null){
+						if(currentInfoPanel.getRequestEngine() == null){
+							currentInfoPanel.setRequestEngine(requestEngine);
+						}
+						
+						if(!currentInfoPanel.getName().matches("neutral")){
+							//currentInfoPanel.updateNumericPanel();					
+						}
+					}
 				}										
-				currentInfoPanel.randomUpdateGraphicPanel(SECOND / msDelay);
-				try {
-					wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(2);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(3);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(4);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(6);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(14);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(20);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(22);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(18);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(27);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(35);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(37);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(33);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);	
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(35);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(32);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(34);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(34);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(34);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(33);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(37);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(39);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(40);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(36);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(34);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(38);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(37);
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(24);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(12);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(8);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(5);													
+				wait(msDelay);
+				currentInfoPanel.specificUpdateGraphicPanel(0);													
+				wait(100000);
+				
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -325,6 +419,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		}
 	}
 	
+	/**
+	 * Class used instead of classic list cells renderer to give them a more coherent design.
+	 * @author Supa Kanojo Hunta
+	 *
+	 */
 	@SuppressWarnings("rawtypes")
 	private static class InfoCellRenderer implements ListCellRenderer{
 
@@ -358,6 +457,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 	}
 	
+	/**
+	 * Listener listening to the JMenuBar at the top of the window.
+	 * @author Supa Kanojo Hunta
+	 *
+	 */
 	private class GlobalMenuListener implements MenuListener{
 
 		@Override
@@ -392,7 +496,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 						}
 						informationsList.setListData(dataArray);
 						
-						connect.setName(MENU_DISCONNECT);
+						connect.setText(MENU_DISCONNECT);
 						
 						tabbedPanelChoice.setComponentAt(0, dashboard);
 						tabbedPanelChoice.setComponentAt(1, RTIPanel);
@@ -406,7 +510,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 				case MENU_DISCONNECT :
 					connection.disconnect();
 					file.setEnabled(false);
-					connect.setName(MENU_CONNECT);
+					connect.setText(MENU_CONNECT);
 					
 					for(int i=0; i<tabbedPanelChoice.getTabCount(); i++){
 						tabbedPanelChoice.setComponentAt(i, disconnectedPanel);
@@ -426,6 +530,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 	}
 	
+	/**
+	 * Listener listening to the list of informations displayed in the Real Time Information panel.
+	 * @author Supa Kanojo Hunta
+	 *
+	 */
 	private class InformationsListListener implements ListSelectionListener{
 
 		private JList<String> informationsList;
@@ -434,24 +543,43 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			this.informationsList = informationsList;
 		}
 		
+		/**
+		 * Update the displayed information panel to the selected information.
+		 */
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			if(!arg0.getValueIsAdjusting()){
-				currentInfoPanel = new InformationPanel(informationsList.getSelectedValue());
+				System.out.println(currentInfoPanel.getName());
+				currentInfoPanel = new InformationPanel(informationsList.getSelectedValue(), requestEngine);
+				refreshRTIPanel();
+				//currentInfoPanel.changeInformationTo(informationsList.getSelectedValue());
+				//currentInfoPanel.setVisible(true);
 			}
 		}
 		
 	}
 
+	/**
+	 * Listener listening to the input of the user in terminal panel.
+	 * @author Supa Kanojo Hunta
+	 *
+	 */
 	private class TerminalOutputKeyListener implements KeyListener{
 
+		/**
+		 * Send user's input through the connection and display the answer.
+		 */
 		@Override
 		public void keyPressed(KeyEvent arg0) {
+			String read = "";
 			if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
 				terminalInput.append(terminalOutput.getText().substring(1));
+				terminalInput.append(" > ");
 				connection.send(terminalOutput.getText().substring(1));
-				terminalInput.append(connection.read() + "\n");
+				read = connection.read();
+				read = read.substring(read.indexOf(terminalOutput.getText().substring(1)) + terminalOutput.getText().substring(1).length());
 				terminalOutput.setText(">");
+				terminalInput.append(read.substring(0, read.length()-1) + "\n");
 			}
 		}
 
@@ -467,8 +595,14 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 
 	}
 	
+	/**
+	 * Default constructor for MainWindow.
+	 */
 	public MainWindow(){
 		super(APPLICATION_NAME);
+		
+		//for tests only
+		requestEngine = new RequestManager();
 		
 		connection = new ELM327Connection();
 		
@@ -483,6 +617,9 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
+	/**
+	 * Custom the look and feel of used components.
+	 */
 	private void customLookAndFeel(){
 	
 		setBackground(Color.DARK_GRAY);
@@ -567,12 +704,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		//UIManager.put("MenuItem.border", BorderFactory.createEmptyBorder(0,0,0,0));
 		UIManager.put("MenuItem.margin", new Insets(10,10,10,10));
 
-
-
-
-
 	}
 
+	/**
+	 * Modify aspect of the frame and its already instantiated components.
+	 */
 	public void initiateAspect(){
 		Toolkit tkt = Toolkit.getDefaultToolkit();
 		Dimension itemWindowDim = tkt.getScreenSize();
@@ -619,18 +755,27 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 	}
 	
+	/**
+	 * Instantiate frame's components.
+	 */
 	public void initiateComponents(){	
 		setJMenuBar();
 		add(getMainPanel());
 		
 	}
 
+	/**
+	 * Build frame's top JMenuBar.
+	 */
 	public void setJMenuBar(){
 		JMenuBar menu = new JMenuBar();
 		
 		file = new JMenu(MENU_FILE);
 		connect = new JMenu(MENU_CONNECT);
 		file.setEnabled(false);
+		
+		//for test only
+		file.setEnabled(true);
 		connect.addMenuListener(new GlobalMenuListener());
 		
 		JMenuItem save = new JMenuItem(MENU_FILE_RECORD);
@@ -673,7 +818,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		this.setJMenuBar(menu);		
 	}
 	
-	
+	/**
+	 * Build frame's main panel.
+	 * @return
+	 */
 	public JTabbedPane getMainPanel(){		
 		
 		tabbedPanelChoice = new JTabbedPane();
@@ -684,7 +832,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		buildTerminalPanel();
 		
 		tabbedPanelChoice.addTab("Dashboard", disconnectedPanel());
-		tabbedPanelChoice.addTab("Real time informations", disconnectedPanel());
+		tabbedPanelChoice.addTab("Real time informations", RTIPanel);
 		tabbedPanelChoice.addTab("Vehicle error codes", disconnectedPanel());
 		tabbedPanelChoice.addTab("Terminal", disconnectedPanel());
 		
@@ -692,8 +840,12 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		return tabbedPanelChoice;
 	}
 	
+	/**
+	 * Build a panel displayed when no connection to the device is established.
+	 * @return
+	 */
 	public JPanel disconnectedPanel(){
-		 JPanel disconnectedPanel = new JPanel(new BorderLayout());
+		JPanel disconnectedPanel = new JPanel(new BorderLayout());
 		
 		JLabel disconnectedLabel = new JLabel("Not connected to any device!");
 		disconnectedLabel.setFont(new Font(GLOBAL_FONT_NAME, Font.TRUETYPE_FONT, 17));
@@ -707,25 +859,38 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		return disconnectedPanel;
 	}
 	
+	/**
+	 * Build real time informations panel.
+	 */
 	@SuppressWarnings("unchecked")
 	public void buildRTIPanel(){
 		RTIPanel = new JPanel(new BorderLayout());
 		
-		String[] informations = {"              "};
+		String[] informations = {"Calculated engine load value", "Engine coolant temperature", "Short term fuel % trim - Bank 1", "Long term fuel % trim - Bank 1", "Intake manifold absolute pressure", "Engine RPM", "Vehicle speed", "Timing advance", "Intake air temperature", "Throttle position"};
 		informationsList = new JList<String>(informations);
 		informationsList.setCellRenderer(new InfoCellRenderer());
 		
 		informationsList.addListSelectionListener(new InformationsListListener(informationsList));
 		
-		JScrollPane infoScroll = new JScrollPane(informationsList);		
+		infoScroll = new JScrollPane(informationsList);		
 		
-		currentInfoPanel = new InformationPanel("néant");
+		currentInfoPanel = new InformationPanel("neutral", requestEngine);
 		
+		//currentInfoPanel.setVisible(false);
 		RTIPanel.add(currentInfoPanel);
 		RTIPanel.add(infoScroll, BorderLayout.WEST);
 		RTIPanel.setName(REAL_TIME_INFORMATIONS_PANEL);
 	}
 	
+	public void refreshRTIPanel(){
+		RTIPanel.removeAll();
+		RTIPanel.add(currentInfoPanel);
+		RTIPanel.add(infoScroll, BorderLayout.WEST);
+	}
+	
+	/**
+	 * Re-send an error codes request and display its result.
+	 */
 	public void refreshErrorCodesArea(){
 		if(requestEngine != null){
 			errorCodesArea.setText("");
@@ -737,6 +902,11 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			errorCodesArea.setText("No error code to display");
 		
 	}
+	
+	/**
+	 * Build error code panel.
+	 * @return
+	 */
 	public JPanel buildErrorCodesPanel(){
 		errorCodesPanel = new JPanel(new BorderLayout());
 		errorCodesArea = new JTextArea();
@@ -782,12 +952,12 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	public JPanel buildDashboardPanel(){
 		dashboard = new JPanel (new GridLayout(2, 3));
 		
-		dashboard.add(new InformationPanel("Engine fuel rate"));
-		dashboard.add(new InformationPanel("Vehicle Speed"));
-		dashboard.add(new InformationPanel("Calculated engine load value"));
-		dashboard.add(new InformationPanel("Engine oil temperature"));
-		dashboard.add(new InformationPanel("Engine RPM"));
-		dashboard.add(new InformationPanel("Engine coolant temperature"));
+		dashboard.add(new InformationPanel("Engine fuel rate", requestEngine));
+		dashboard.add(new InformationPanel("Vehicle Speed", requestEngine));
+		dashboard.add(new InformationPanel("Calculated engine load value", requestEngine));
+		dashboard.add(new InformationPanel("Engine oil temperature", requestEngine));
+		dashboard.add(new InformationPanel("Engine RPM", requestEngine));
+		dashboard.add(new InformationPanel("Engine coolant temperature", requestEngine));
 		
 		dashboard.setName("Dashboard");
 		
@@ -798,5 +968,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	public static void main(String[] args){
 		MainWindow main = new MainWindow();
 	}
+
+	
 	
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public interface RequestEngineModel {
 
 	public float getUpToDateData(String pidName);
+	public String getUnit(String pidName);
 	public String[] getCompatibleRequests();
 	public ArrayList<String> getErrorCodes();
 }
