@@ -17,10 +17,10 @@ public class RequestManagerTest {
 	
 	public void setUp(){
 		ArrayList<Integer> vehicleRef = new ArrayList<Integer>();
-		vehicleRef.add(0xBE);
-		vehicleRef.add(0x1F);
-		vehicleRef.add(0xA8);
-		vehicleRef.add(0x13);
+		vehicleRef.add(0x01);
+		vehicleRef.add(0x12);
+		//vehicleRef.add(0xB8);
+		//vehicleRef.add(0x10);
 		
 		manager = new RequestManager();	
 		manager.setVehicleRef(vehicleRef);
@@ -38,6 +38,8 @@ public class RequestManagerTest {
 		setUp();
 		int existingRequestId = 0x010C,
 			nonExistingRequestId = 0x010D;
+		
+		System.out.println(manager.getCompatibleRequests());
 		
 		assertTrue(manager.requestAlreadyCreated(existingRequestId));
 		assertFalse(manager.requestAlreadyCreated(nonExistingRequestId));
