@@ -150,7 +150,7 @@ public class FileHandler {
 		return mean;			
 	}
 	
-	public static void saveData(String name, float data, Date date){
+	public static void saveData(String name, double data, Date date){
 		PrintWriter toFile = null;
 		Calendar calendar = Calendar.getInstance();
 		String saveFileName = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + " - " + 

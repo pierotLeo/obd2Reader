@@ -1,9 +1,12 @@
 package fr.institute.engine;
 
 import fr.institute.connection.*;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+
+import com.japisoft.formula.node.EvaluateException;
 
 public class RequestManager implements RequestEngineModel, DirectAccessToRequestRouteTable{
 
@@ -199,7 +202,7 @@ public class RequestManager implements RequestEngineModel, DirectAccessToRequest
 	}
 	
 	@Override
-	public float getUpToDateData(String pidName) {
+	public double getUpToDateData(String pidName) throws EvaluateException{
 		sendRequest(pidName);
 		readRequest(pidName);
 

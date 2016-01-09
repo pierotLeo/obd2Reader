@@ -6,33 +6,28 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.plaf.basic.BasicScrollBarUI;
+
+import com.japisoft.formula.node.EvaluateException;
 
 import fr.institute.connection.Connection;
 import fr.institute.connection.ELM327Connection;
@@ -52,6 +47,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JPanel RTIPanel;
 	private ArrayList<String> displayedInformations;
 	private ArrayList<Boolean> recordedInformations;
+	private double saveDelay = 100;
 	private JList<String> informationsList;
 	private JPanel errorCodesPanel;
 	private JTextArea errorCodesArea;
@@ -70,8 +66,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		private ArrayList<JCheckBox> nonRecordedBox;
 		private JPanel recordedList;
 		private JPanel nonRecordedList;
+		private ButtonGroup delaySelectionGroup;
 		
 		//for test only
+		@SuppressWarnings("unused")
 		public RecordFrame(ArrayList<String> p_names, ArrayList<Boolean> p_record){
 			super();
 			
@@ -115,17 +113,71 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			
 			mainPanel.add(getRecordedPanel());
 			mainPanel.add(getNonRecordedPanel());
-			mainPanel.add(getHistogramPanel());
+			mainPanel.add(getSouthLeftPanel());
 			
 			return mainPanel;
 		}
 
-		public JPanel getHistogramPanel(){
-			JPanel histogramPanel = new JPanel();
+		public class DelaySelectionListener implements ActionListener{
+
+			private double value;
 			
+			public DelaySelectionListener(double value){
+				this.value = value;
+			}
 			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveDelay = value;
+			}
 			
-			return histogramPanel;
+		}
+		
+		public JPanel getSouthLeftPanel(){
+			JPanel southLeft = new JPanel(new BorderLayout());
+			JPanel buttonPanel = new JPanel(new GridLayout(2,2));
+			
+			JLabel delaySelection = new JLabel("Please select the delay between each save :");
+			
+			JRadioButton ms100 = new JRadioButton("0.1 second");
+			ms100.addActionListener(new DelaySelectionListener(100));
+			ms100.setName("100");
+			if(saveDelay == 100)
+				ms100.setSelected(true);
+			
+			JRadioButton ms500 = new JRadioButton("0.5 second");
+			ms500.addActionListener(new DelaySelectionListener(500));
+			ms500.setName("500");
+			if(saveDelay == 500)
+				ms500.setSelected(true);
+			
+			JRadioButton ms1000 = new JRadioButton("1 second");
+			ms1000.addActionListener(new DelaySelectionListener(1000));
+			ms1000.setName("1000");
+			if(saveDelay == 1000)
+				ms1000.setSelected(true);
+			
+			JRadioButton ms2000 = new JRadioButton("2 seconds");
+			ms2000.addActionListener(new DelaySelectionListener(2000));
+			ms2000.setName("2000");
+			if(saveDelay == 2000)
+				ms2000.setSelected(true);
+			
+			delaySelectionGroup = new ButtonGroup();
+			
+			delaySelectionGroup.add(ms100);
+			delaySelectionGroup.add(ms500);
+			delaySelectionGroup.add(ms1000);
+			delaySelectionGroup.add(ms2000);
+			
+			buttonPanel.add(ms100);
+			buttonPanel.add(ms500);
+			buttonPanel.add(ms1000);
+			buttonPanel.add(ms2000);
+			southLeft.add(delaySelection, BorderLayout.NORTH);
+			southLeft.add(buttonPanel);
+			
+			return southLeft;
 		}
 		
 		/**
@@ -150,8 +202,8 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			JCheckBox currentInfoBox;
 			for(String infoName : getInfoType(false)){
 				currentInfoBox = new JCheckBox(infoName);
-				nonRecordedBox.add(currentInfoBox);
-				nonRecordedList.add(currentInfoBox);
+				recordedBox.add(currentInfoBox);
+				recordedList.add(currentInfoBox);
 			}
 					
 			JScrollPane scroll = new JScrollPane(nonRecordedList);
@@ -188,8 +240,8 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			JCheckBox currentInfoBox;
 			for(String infoName : getInfoType(true)){
 				currentInfoBox = new JCheckBox(infoName);
-				recordedBox.add(currentInfoBox);
-				recordedList.add(currentInfoBox);
+				nonRecordedBox.add(currentInfoBox);
+				nonRecordedList.add(currentInfoBox);
 			}
 					
 			JScrollPane scroll = new JScrollPane(recordedList);
@@ -300,19 +352,25 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		@Override
 		public synchronized void run() {
 			String name;
-			float data;
+			double data;
 			Date date;
 			int msDelay = 100;
+			long lastSave = 0;
 			
 			while(true){
 				try {
 				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes|Dashboard)") && connect.getText().matches("disconnect")){
 					for(int i=0; i<displayedInformations.size(); i++){
-						if(recordedInformations.get(i)){
-							name =displayedInformations.get(i);
-							data = requestEngine.getUpToDateData(displayedInformations.get(i));
-							date = new Date(System.currentTimeMillis());
-							FileHandler.saveData(name, data, date);
+						if(recordedInformations.get(i) && System.currentTimeMillis() - lastSave > saveDelay){
+							try{
+								name =displayedInformations.get(i);
+								data = requestEngine.getUpToDateData(displayedInformations.get(i));
+								date = new Date(System.currentTimeMillis());
+								FileHandler.saveData(name, data, date);
+								lastSave = System.currentTimeMillis();								
+							}catch(EvaluateException e){
+								JOptionPane.showMessageDialog(null, "An error occurred while recording your data.", "Interrupted", JOptionPane.ERROR_MESSAGE);
+							}
 						}
 					}
 					if(requestEngine != null){
@@ -321,96 +379,16 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 						}
 						
 						if(!currentInfoPanel.getName().matches("neutral")){
-							//currentInfoPanel.updateNumericPanel();					
+							try {
+								currentInfoPanel.updateNumericPanel();
+								currentInfoPanel.updateGraphicPanel();
+							} catch (EvaluateException e) {
+								JOptionPane.showMessageDialog(null, "An error occurred while displaying your data", "Interrupted", JOptionPane.ERROR_MESSAGE);
+							}
 						}
 					}
-				}										
-				currentInfoPanel.specificUpdateGraphicPanel(2);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(3);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(4);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(6);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(14);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(20);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(22);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(18);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(27);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(35);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(37);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(33);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);	
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(35);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(32);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(34);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(34);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(34);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(33);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(37);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(39);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(40);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(36);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(34);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(38);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(37);
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(24);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(12);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(8);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(5);													
-				wait(msDelay);
-				currentInfoPanel.specificUpdateGraphicPanel(0);													
-				wait(100000);
+				}													
+				wait(100);
 				
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -602,7 +580,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		super(APPLICATION_NAME);
 		
 		//for tests only
-		requestEngine = new RequestManager();
+		//requestEngine = new RequestManager();
 		
 		connection = new ELM327Connection();
 		
@@ -674,6 +652,15 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		UIManager.put("OptionPane.messageFont", new Font(GLOBAL_FONT_NAME, Font.TRUETYPE_FONT, 17));
 		UIManager.put("OptionPane.messageForeground", Color.GREEN);
 		UIManager.put("OptionPane.messageAreaBorder", NEUTRAL_DARK_GRAY_BORDER);
+		
+		UIManager.put("RadioButton.background", Color.DARK_GRAY);
+		UIManager.put("RadioButton.focus", Color.DARK_GRAY);
+		UIManager.put("RadioButton.font", new Font(GLOBAL_FONT_NAME, Font.TRUETYPE_FONT, 17));
+		UIManager.put("RadioButton.foreground", Color.GREEN);
+		UIManager.put("RadioButton.select", Color.GREEN);
+		
+		UIManager.put("Label.foreground", Color.GREEN);
+		UIManager.put("Label.font", new Font(GLOBAL_FONT_NAME, Font.TRUETYPE_FONT, 12));
 		
 		UIManager.put("Button.background", Color.GREEN);
 		UIManager.put("Button.border", NEUTRAL_GREEN_BORDER);
@@ -775,7 +762,8 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		file.setEnabled(false);
 		
 		//for test only
-		file.setEnabled(true);
+		//file.setEnabled(true);
+		
 		connect.addMenuListener(new GlobalMenuListener());
 		
 		JMenuItem save = new JMenuItem(MENU_FILE_RECORD);
@@ -867,6 +855,13 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		RTIPanel = new JPanel(new BorderLayout());
 		
 		String[] informations = {"Calculated engine load value", "Engine coolant temperature", "Short term fuel % trim - Bank 1", "Long term fuel % trim - Bank 1", "Intake manifold absolute pressure", "Engine RPM", "Vehicle speed", "Timing advance", "Intake air temperature", "Throttle position"};
+		displayedInformations = new ArrayList<String>(Arrays.asList(informations));
+		recordedInformations = new ArrayList<Boolean>();
+		for(int i=0; i<displayedInformations.size(); i++){
+			recordedInformations.add(false);
+		}
+		
+		
 		informationsList = new JList<String>(informations);
 		informationsList.setCellRenderer(new InfoCellRenderer());
 		

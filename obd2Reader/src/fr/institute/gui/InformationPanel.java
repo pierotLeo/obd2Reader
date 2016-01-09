@@ -26,6 +26,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import com.japisoft.formula.node.EvaluateException;
+
 import fr.institute.engine.RequestEngineModel;
 
 @SuppressWarnings("serial")
@@ -165,7 +167,7 @@ public class InformationPanel extends JTabbedPane{
         return panel;
     }
 	
-	public void updateGraphicPanel(){
+	public void updateGraphicPanel() throws EvaluateException{
 		String unit = "";
 		if(requestEngine != null)
 			unit = requestEngine.getUnit(name);
@@ -190,8 +192,9 @@ public class InformationPanel extends JTabbedPane{
 	/**
 	 * Add a new data to the numeric representation's set of data and update it.
 	 * @param newData : data to update representation with.
+	 * @throws EvaluateException 
 	 */
-	public void updateNumericPanel(){
+	public void updateNumericPanel() throws EvaluateException{
 		dataSet.setValue(requestEngine.getUpToDateData(name));
 	}	
 	
