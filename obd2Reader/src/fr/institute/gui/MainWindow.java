@@ -54,8 +54,8 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JPanel terminal;
 	private JTextField terminalOutput;
 	private JTextArea terminalInput;
-	private ArrayList<InformationPanel> dashboard;
-	private JPanel dashboardPanel;
+	//private ArrayList<InformationPanel> dashboard;
+	//private JPanel dashboardPanel;
 	private JPanel disconnectedPanel;
 	private JScrollPane infoScroll;
 	
@@ -360,7 +360,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 			
 			while(true){
 				try {
-				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes|Dashboard)") && connect.getText().matches("disconnect")){
+				if(tabbedPanelChoice.getSelectedComponent().getName().matches("(Real time informations|Vehicle error codes)") && connect.getText().matches("disconnect")){
 					for(int i=0; i<displayedInformations.size(); i++){
 						if(recordedInformations.get(i) && System.currentTimeMillis() - lastSave > saveDelay){
 							try{
@@ -388,7 +388,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 							}
 						}
 						
-						for(InformationPanel dashboardPan : dashboard){
+						/*for(InformationPanel dashboardPan : dashboard){
 							if(dashboardPan.getRequestEngine() == null){
 								dashboardPan.setRequestEngine(requestEngine);
 							}
@@ -401,7 +401,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 									JOptionPane.showMessageDialog(null, "An error occurred while displaying your data", "Interrupted", JOptionPane.ERROR_MESSAGE);
 								}
 							}
-						}
+						}*/
 					}
 				}													
 				wait(100);
@@ -492,10 +492,10 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 						
 						connect.setText(MENU_DISCONNECT);
 						
-						tabbedPanelChoice.setComponentAt(0, dashboardPanel);
-						tabbedPanelChoice.setComponentAt(1, RTIPanel);
-						tabbedPanelChoice.setComponentAt(2, errorCodesPanel);
-						tabbedPanelChoice.setComponentAt(3, terminal);
+						//tabbedPanelChoice.setComponentAt(0, dashboardPanel);
+						tabbedPanelChoice.setComponentAt(0, RTIPanel);
+						tabbedPanelChoice.setComponentAt(1, errorCodesPanel);
+						tabbedPanelChoice.setComponentAt(2, terminal);
 					}
 					else{
 						JOptionPane.showMessageDialog(null, "Connection failed :(", "Interrupted", JOptionPane.ERROR_MESSAGE);
@@ -830,7 +830,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 		tabbedPanelChoice = new JTabbedPane();
 		
-		buildDashboardPanel();
+		//buildDashboardPanel();
 		buildRTIPanel();
 		buildErrorCodesPanel();
 		buildTerminalPanel();
@@ -960,7 +960,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		return terminal;
 	}
 	
-	public JPanel buildDashboardPanel(){
+	/*public JPanel buildDashboardPanel(){
 		dashboardPanel = new JPanel (new GridLayout(2, 3));
 		dashboard = new ArrayList<InformationPanel>();
 		
@@ -978,7 +978,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		dashboardPanel.setName("Dashboard");
 		
 		return dashboardPanel;
-	}
+	}*/
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args){

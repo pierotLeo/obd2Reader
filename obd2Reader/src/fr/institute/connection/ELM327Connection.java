@@ -80,7 +80,7 @@ public class ELM327Connection implements Connection{
 	 *
 	 * @param cmd : string to send.
 	 */
-	public void send(String cmd){
+	public synchronized void send(String cmd){
 		btConnection.send(cmd);
 	}
 	
@@ -89,7 +89,7 @@ public class ELM327Connection implements Connection{
 	 * 
 	 * @return : string that have been read.
 	 */
-	public String read(){
+	public synchronized String read(){
 		String read = btConnection.readUntil(">");
 		System.out.println("read : " + read);
 		return(read);
@@ -98,7 +98,7 @@ public class ELM327Connection implements Connection{
 	/**
 	 * Getter for the connection's input stream.
 	 */
-	public InputStream getInputStream(){
+	public synchronized InputStream getInputStream(){
 		return btConnection.getInputStream();
 	}
 	
@@ -106,7 +106,7 @@ public class ELM327Connection implements Connection{
 	/**
 	 * Getter for the connection's output stream.
 	 */
-	public OutputStream getOutputStream(){
+	public synchronized OutputStream getOutputStream(){
 		return btConnection.getOutputStream();
 	}
 
