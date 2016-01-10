@@ -962,6 +962,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	
 	public JPanel buildDashboardPanel(){
 		dashboardPanel = new JPanel (new GridLayout(2, 3));
+		dashboard = new ArrayList<InformationPanel>();
 		
 		dashboard.add(new InformationPanel("Engine fuel rate", requestEngine));
 		dashboard.add(new InformationPanel("Vehicle Speed", requestEngine));
