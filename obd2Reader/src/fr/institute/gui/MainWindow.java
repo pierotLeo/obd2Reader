@@ -54,7 +54,8 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	private JPanel terminal;
 	private JTextField terminalOutput;
 	private JTextArea terminalInput;
-	private JPanel dashboard;
+	private ArrayList<InformationPanel> dashboard;
+	private JPanel dashboardPanel;
 	private JPanel disconnectedPanel;
 	private JScrollPane infoScroll;
 	
@@ -386,6 +387,21 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 								JOptionPane.showMessageDialog(null, "An error occurred while displaying your data", "Interrupted", JOptionPane.ERROR_MESSAGE);
 							}
 						}
+						
+						for(InformationPanel dashboardPan : dashboard){
+							if(dashboardPan.getRequestEngine() == null){
+								dashboardPan.setRequestEngine(requestEngine);
+							}
+							
+							if(!dashboardPan.getName().matches("neutral")){
+								try {
+									dashboardPan.updateNumericPanel();
+									dashboardPan.updateGraphicPanel();
+								} catch (EvaluateException e) {
+									JOptionPane.showMessageDialog(null, "An error occurred while displaying your data", "Interrupted", JOptionPane.ERROR_MESSAGE);
+								}
+							}
+						}
 					}
 				}													
 				wait(100);
@@ -476,7 +492,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 						
 						connect.setText(MENU_DISCONNECT);
 						
-						tabbedPanelChoice.setComponentAt(0, dashboard);
+						tabbedPanelChoice.setComponentAt(0, dashboardPanel);
 						tabbedPanelChoice.setComponentAt(1, RTIPanel);
 						tabbedPanelChoice.setComponentAt(2, errorCodesPanel);
 						tabbedPanelChoice.setComponentAt(3, terminal);
@@ -904,7 +920,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	 */
 	public JPanel buildErrorCodesPanel(){
 		errorCodesPanel = new JPanel(new BorderLayout());
-		errorCodesArea = new JTextArea();
+		errorCodesArea = new JTextArea("No trouble codes to display.");
 		
 		JScrollPane errorCodesAreaScroller = new JScrollPane(errorCodesArea);
 				
@@ -945,7 +961,7 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 	}
 	
 	public JPanel buildDashboardPanel(){
-		dashboard = new JPanel (new GridLayout(2, 3));
+		dashboardPanel = new JPanel (new GridLayout(2, 3));
 		
 		dashboard.add(new InformationPanel("Engine fuel rate", requestEngine));
 		dashboard.add(new InformationPanel("Vehicle Speed", requestEngine));
@@ -954,9 +970,13 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		dashboard.add(new InformationPanel("Engine RPM", requestEngine));
 		dashboard.add(new InformationPanel("Engine coolant temperature", requestEngine));
 		
-		dashboard.setName("Dashboard");
+		for(InformationPanel dashboardPan : dashboard){
+			dashboardPanel.add(dashboardPan);
+		}
 		
-		return dashboard;
+		dashboardPanel.setName("Dashboard");
+		
+		return dashboardPanel;
 	}
 
 	@SuppressWarnings("unused")

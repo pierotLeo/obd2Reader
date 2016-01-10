@@ -34,7 +34,7 @@ public class ELM327Connection implements Connection{
 	 * Cut the connection to the module.
 	 */
 	public void disconnect(){
-		btConnection = null;
+		btConnection.disconnect();
 	}
 	
 	/**
@@ -50,7 +50,8 @@ public class ELM327Connection implements Connection{
 			if(btConnection.searchServices("OBDII", "1101")!=0){
 				url = findRfcommUrl(btConnection.getUrls());
 				if(!url.isEmpty()){
-					btConnection.clientConnection(url);
+					btConnection.setUrl(url);
+					btConnection.clientConnection();
 					wasAbleToConnect = true;
 				}
 			}

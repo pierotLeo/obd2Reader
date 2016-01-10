@@ -27,6 +27,7 @@ public class BluetoothConnection {
 	private StreamConnection streamConnection;
 	private InputStream inputStream;
 	private OutputStream outputStream;
+	private String url;
 	
 	/**
      * Default constructor for BluetoothConnection.
@@ -47,6 +48,18 @@ public class BluetoothConnection {
 		
 		discoveryAgent = localDevice.getDiscoveryAgent();
 			
+	}
+	
+	public void disconnect (){
+		if(streamConnection!=null && inputStream!=null && outputStream!=null){
+			try {
+				inputStream.close();
+				outputStream.close();
+				streamConnection.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -215,7 +228,7 @@ public class BluetoothConnection {
 	 *
 	 *@param url : connection URL needed to connect to the service.
      */
-	public void clientConnection(String url){
+	public void clientConnection(){
 		try {
 			streamConnection = (StreamConnection) Connector.open(url);
 			outputStream = streamConnection.openOutputStream();
@@ -223,6 +236,10 @@ public class BluetoothConnection {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void setUrl(String url){
+		this.url = url;
 	}
 	
 	//déplacer vers ObdCommand
