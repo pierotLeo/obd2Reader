@@ -835,8 +835,8 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		buildErrorCodesPanel();
 		buildTerminalPanel();
 		
-		tabbedPanelChoice.addTab("Dashboard", disconnectedPanel());
-		tabbedPanelChoice.addTab("Real time informations", RTIPanel);
+		//tabbedPanelChoice.addTab("Dashboard", disconnectedPanel());
+		tabbedPanelChoice.addTab("Real time informations", disconnectedPanel());
 		tabbedPanelChoice.addTab("Vehicle error codes", disconnectedPanel());
 		tabbedPanelChoice.addTab("Terminal", disconnectedPanel());
 		
@@ -979,11 +979,6 @@ public class MainWindow extends JFrame implements MainWindowConstants{
 		
 		return dashboardPanel;
 	}*/
-
-	@SuppressWarnings("unused")
-	public static void main(String[] args){
-		MainWindow main = new MainWindow();
-	}
 
 	
 	
